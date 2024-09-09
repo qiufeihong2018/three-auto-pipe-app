@@ -167,7 +167,7 @@ function randomLook() {
 }
 
 function look() {
-  camera.position.set(10, 10, 10);
+  camera.position.set(25, 25, 25);
   const center = new THREE.Vector3(0, 0, 0);
   camera.lookAt(center);
   controls.update();
