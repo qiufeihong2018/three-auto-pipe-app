@@ -6,6 +6,7 @@ import { textures } from './textures';
 import { chance, random, showElementsIf, shuffleArrayInPlace } from './util';
 import { clearGrid } from './node';
 import { Pipe } from './pipe';
+import { initGui } from './gui';
 
 const JOINTS_ELBOW = "elbow";
 const JOINTS_BALL = "ball";
@@ -15,21 +16,15 @@ const JOINTS_CYCLE = "cycle";
 const jointsCycleArray = [JOINTS_ELBOW, JOINTS_BALL, JOINTS_MIXED];
 let jointsCycleIndex = 0;
 
-// 关节类型
-const jointTypeSelect = document.getElementById("joint-types") as HTMLSelectElement;
 
 let pipes: any[] = [];
 
 const options = {
   multiple: true,
   texturePath: null,
-  joints: jointTypeSelect.value,
+  joints: 'elbow', // 切换关节类型
   interval: [16, 24], // 渐隐效果的时间区间
 };
-// 切换关节类型
-jointTypeSelect.addEventListener("change", function() {
-  options.joints = jointTypeSelect.value;
-});
 
 const canvasContainer = document.getElementById("canvas-container") as HTMLCanvasElement;
 
@@ -57,9 +52,7 @@ const camera = new THREE.PerspectiveCamera(
 // controls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enabled = false;
-// controls.autoRotate = true;
-
-// scene
+// 搭建场景
 const scene = new THREE.Scene();
 
 // lighting
@@ -81,8 +74,6 @@ let dissolveTransitionFrames = dissolveTransitionSeconds * 60;
 let dissolveEndCallback;
 
 function dissolve(seconds, endCallback) {
-  // TODO: determine rect sizes better and simplify
-  // (silly approximation of squares of a particular size:)
   dissolveRectsPerRow = Math.ceil(window.innerWidth / 20);
   dissolveRectsPerColumn = Math.ceil(window.innerHeight / 20);
 
@@ -100,6 +91,7 @@ function dissolve(seconds, endCallback) {
   dissolveTransitionFrames = dissolveTransitionSeconds * 60;
   dissolveEndCallback = endCallback;
 }
+
 function finishDissolve() {
   dissolveEndCallback();
   dissolveRects = [];
@@ -141,7 +133,6 @@ function reset() {
   clearing = false;
 }
 
-// this function is executed on each animation frame
 function animate() {
   controls.update();
   if (options.texturePath && !textures[options.texturePath]) {
@@ -294,18 +285,6 @@ canvasContainer.addEventListener(
   false
 );
 
-const fullscreenButton = document.getElementById("fullscreen-button") as HTMLButtonElement;
-fullscreenButton.addEventListener(
-  "click",
-  function() {
-    if (canvasContainer.requestFullscreen) {
-      // W3C API
-      canvasContainer.requestFullscreen();
-    }
-  },
-  false
-);
-
 const toggleControlButton = document.getElementById("toggle-controls") as HTMLButtonElement;
 toggleControlButton.addEventListener(
   "click",
@@ -349,6 +328,17 @@ window.addEventListener("hashchange", updateFromParametersInURL);
 
 // start animation
 export function render() {
+  initGui({
+    clear: () => {
+      clear(true)
+      window.getSelection()?.removeAllRanges();
+      document.activeElement?.blur();
+    },
+    // 切换关节类型
+    setJointType: (val) => {
+      options.joints = val;
+    }
+  });
   animate();
 }
 
