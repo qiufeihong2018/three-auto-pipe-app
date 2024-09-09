@@ -3,10 +3,11 @@ import * as THREE from 'three';
 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { textures } from './textures';
-import { chance, random, shuffleArrayInPlace } from './util';
+import { chance, random } from './util';
 import { clearGrid } from './node';
 import { Pipe } from './pipe';
 import { initGui } from './gui';
+import { dissolve, runDissolveEffect } from './dissolveEffect';
 
 const JOINTS_ELBOW = "elbow";
 const JOINTS_BALL = "ball";
@@ -27,10 +28,6 @@ const options = {
 };
 
 const canvasContainer = document.getElementById("canvas-container") as HTMLCanvasElement;
-
-// 2d canvas for dissolve effect
-const canvas2d = document.getElementById("canvas-2d") as HTMLCanvasElement;
-const ctx2d = canvas2d.getContext("2d")!;
 
 // renderer
 const canvasWebGL = document.getElementById("canvas-webgl") as HTMLCanvasElement;
@@ -63,52 +60,21 @@ const directionalLightL = new THREE.DirectionalLight(0xffffff, 0.9);
 directionalLightL.position.set(-1.2, 1.5, 0.5);
 scene.add(directionalLightL);
 
-// dissolve transition effect
 
-let dissolveRects: { x: number; y: number; }[] = [];
-let dissolveRectsIndex = -1;
-let dissolveRectsPerRow = 50;
-let dissolveRectsPerColumn = 50;
-let dissolveTransitionSeconds = 2;
-let dissolveTransitionFrames = dissolveTransitionSeconds * 60;
-let dissolveEndCallback;
-
-function dissolve(seconds, endCallback) {
-  dissolveRectsPerRow = Math.ceil(window.innerWidth / 20);
-  dissolveRectsPerColumn = Math.ceil(window.innerHeight / 20);
-
-  dissolveRects = new Array(dissolveRectsPerRow * dissolveRectsPerColumn)
-    .fill(null)
-    .map(function(_null, index) {
-      return {
-        x: index % dissolveRectsPerRow,
-        y: Math.floor(index / dissolveRectsPerRow),
-      };
-    });
-  shuffleArrayInPlace(dissolveRects);
-  dissolveRectsIndex = 0;
-  dissolveTransitionSeconds = seconds;
-  dissolveTransitionFrames = dissolveTransitionSeconds * 60;
-  dissolveEndCallback = endCallback;
-}
-
-function finishDissolve() {
-  dissolveEndCallback();
-  dissolveRects = [];
-  dissolveRectsIndex = -1;
-  ctx2d.clearRect(0, 0, canvas2d.width, canvas2d.height);
-}
-
-let clearing = false;
+let clearing = false; // 是否正在清除场景
 let clearTID = -1;
 
-// 清除场景
-function clear(fast) {
+/**
+ * 清除场景
+ * @param fast 是否快速清除
+ */
+function clear(fast = true) {
   clearTimeout(clearTID);
   clearTID = setTimeout(
     clear,
     random(options.interval[0], options.interval[1]) * 1000
   );
+
   if (!clearing) {
     clearing = true;
     const fadeOutTime = fast ? 0.2 : 2;
@@ -160,7 +126,7 @@ function animate() {
     if (chance(1 / 20)) {
       pipeOptions.teapotChance = 1 / 20; // why not? :)
       pipeOptions.texturePath = "images/textures/candycane.png";
-      // TODO: DRY
+   
       if (!textures[pipeOptions.texturePath]) {
         const textureLoader = new THREE.TextureLoader();
         const texture = textureLoader.load(pipeOptions.texturePath);
@@ -179,56 +145,7 @@ function animate() {
     renderer.render(scene, camera);
   }
 
-  if (
-    canvas2d.width !== window.innerWidth ||
-    canvas2d.height !== window.innerHeight
-  ) {
-    canvas2d.width = window.innerWidth;
-    canvas2d.height = window.innerHeight;
-    // TODO: make the 2d canvas really low resolution, and stretch it with CSS, with pixelated interpolation
-    if (dissolveRectsIndex > -1) {
-      for ( let i = 0; i < dissolveRectsIndex; i++) {
-        const rect = dissolveRects[i];
-        // TODO: could precompute rect in screen space, or at least make this clearer with "xIndex"/"yIndex"
-        const rectWidth = innerWidth / dissolveRectsPerRow;
-        const rectHeight = innerHeight / dissolveRectsPerColumn;
-        ctx2d.fillStyle = "black";
-        ctx2d.fillRect(
-          Math.floor(rect.x * rectWidth),
-          Math.floor(rect.y * rectHeight),
-          Math.ceil(rectWidth),
-          Math.ceil(rectHeight)
-        );
-      }
-    }
-  }
-  if (dissolveRectsIndex > -1) {
-    // TODO: calibrate based on time transition is actually taking
-    const rectsAtATime = Math.floor(
-      dissolveRects.length / dissolveTransitionFrames
-    );
-    for (
-      let i = 0;
-      i < rectsAtATime && dissolveRectsIndex < dissolveRects.length;
-      i++
-    ) {
-      const rect = dissolveRects[dissolveRectsIndex];
-      // TODO: could precompute rect in screen space, or at least make this clearer with "xIndex"/"yIndex"
-      const rectWidth = innerWidth / dissolveRectsPerRow;
-      const rectHeight = innerHeight / dissolveRectsPerColumn;
-      ctx2d.fillStyle = "black";
-      ctx2d.fillRect(
-        Math.floor(rect.x * rectWidth),
-        Math.floor(rect.y * rectHeight),
-        Math.ceil(rectWidth),
-        Math.ceil(rectHeight)
-      );
-      dissolveRectsIndex += 1;
-    }
-    if (dissolveRectsIndex === dissolveRects.length) {
-      finishDissolve();
-    }
-  }
+  runDissolveEffect()
 
   requestAnimationFrame(animate);
 }
@@ -266,17 +183,6 @@ addEventListener(
   },
   false
 );
-
-canvasContainer.addEventListener("mousedown", function(e) {
-  e.preventDefault();
-  if (!controls.enabled) {
-    if (e.button) {
-      clear(true);
-    }
-  }
-  window.getSelection()?.removeAllRanges();
-  document.activeElement?.blur();
-});
 
 // 禁用鼠标右键
 canvasContainer.addEventListener(
