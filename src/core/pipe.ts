@@ -11,31 +11,56 @@ const gridBounds = new THREE.Box3(
   new THREE.Vector3(10, 10, 10)
 );
 
-export const Pipe = function(scene, options) {
-  const self = this;
-  const pipeRadius = 0.2;
-  const ballJointRadius = pipeRadius * 1.5;
-  const teapotSize = ballJointRadius;
+const pipeRadius = 0.2;
+const ballJointRadius = pipeRadius * 1.5;
+const teapotSize = ballJointRadius;
 
-  self.currentPosition = randomIntegerVector3WithinBox(gridBounds);
-  self.positions = [self.currentPosition];
-  self.object3d = new THREE.Object3D();
-  scene.add(self.object3d);
-  if (options.texturePath) {
-    self.material = new THREE.MeshLambertMaterial({
-      map: textures[options.texturePath],
-    });
-  } else {
-    const color = randomInteger(0, 0xffffff);
-    const emissive = new THREE.Color(color).multiplyScalar(0.3);
-    self.material = new THREE.MeshPhongMaterial({
-      specular: 0xa9fcff,
-      color: color,
-      emissive: emissive,
-      shininess: 100,
-    });
+export class Pipe {
+  public currentPosition;
+  public positions;
+  public object3d: THREE.Object3D;
+  public material;
+  public options;
+
+  constructor(scene, options) {
+    this.options = options;
+  
+    this.currentPosition = randomIntegerVector3WithinBox(gridBounds);
+    this.positions = [this.currentPosition];
+    this.object3d = new THREE.Object3D();
+    scene.add(this.object3d);
+
+    if (options.texturePath) {
+      this.material = new THREE.MeshLambertMaterial({
+        map: textures[options.texturePath],
+      });
+    } else {
+      const color = randomInteger(0, 0xffffff);
+      const emissive = new THREE.Color(color).multiplyScalar(0.3);
+      this.material = new THREE.MeshPhongMaterial({
+        specular: 0xa9fcff,
+        color: color,
+        emissive: emissive,
+        shininess: 100,
+      });
+    }
+
+  
+    setAt(this.currentPosition, this);
+  
+    this.makeBallJoint(this.currentPosition);
   }
-  const makeCylinderBetweenPoints = function(fromPoint, toPoint, material) {
+
+  public makeBallJoint(position) {
+    const ball = new THREE.Mesh(
+      new THREE.SphereGeometry(ballJointRadius, 8, 8),
+      this.material
+    );
+    ball.position.copy(position);
+    this.object3d.add(ball);
+  };
+
+  public makeCylinderBetweenPoints(fromPoint, toPoint, material) {
     const deltaVector = new THREE.Vector3().subVectors(toPoint, fromPoint);
     const arrow = new THREE.ArrowHelper(
       deltaVector.clone().normalize(),
@@ -55,50 +80,42 @@ export const Pipe = function(scene, options) {
     mesh.position.addVectors(fromPoint, deltaVector.multiplyScalar(0.5));
     mesh.updateMatrix();
 
-    self.object3d.add(mesh);
+    this.object3d.add(mesh);
   };
-  const makeBallJoint = function(position) {
-    const ball = new THREE.Mesh(
-      new THREE.SphereGeometry(ballJointRadius, 8, 8),
-      self.material
-    );
-    ball.position.copy(position);
-    self.object3d.add(ball);
-  };
-  const makeTeapotJoint = function(position) {
+
+  public makeTeapotJoint (position) {
     const teapot = new THREE.Mesh(
-      // 
       new TeapotGeometry(teapotSize, 10, true, true, true, true),
-      self.material
+      this.material
       //new THREE.MeshLambertMaterial({ map: teapotTexture })
     );
     teapot.position.copy(position);
     teapot.rotation.x = (Math.floor(random(0, 50)) * Math.PI) / 2;
     teapot.rotation.y = (Math.floor(random(0, 50)) * Math.PI) / 2;
     teapot.rotation.z = (Math.floor(random(0, 50)) * Math.PI) / 2;
-    self.object3d.add(teapot);
+    this.object3d.add(teapot);
   };
-  const makeElbowJoint = function(fromPosition) {
+
+  public makeElbowJoint(fromPosition) {
     // "elball" (not a proper elbow)
     const elball = new THREE.Mesh(
       new THREE.SphereGeometry(pipeRadius, 8, 8),
-      self.material
+      this.material
     );
     elball.position.copy(fromPosition);
-    self.object3d.add(elball);
+    this.object3d.add(elball);
   };
 
-  setAt(self.currentPosition, self);
+  public update() {
+ 
 
-  makeBallJoint(self.currentPosition);
 
-  self.update = function() {
     let directionVector;
     let lastDirectionVector;
-    if (self.positions.length > 1) {
-      const lastPosition = self.positions[self.positions.length - 2];
+    if (this.positions.length > 1) {
+      const lastPosition = this.positions[this.positions.length - 2];
       lastDirectionVector = new THREE.Vector3().subVectors(
-        self.currentPosition,
+        this.currentPosition,
         lastPosition
       );
     }
@@ -109,7 +126,7 @@ export const Pipe = function(scene, options) {
       directionVector[chooseFrom("xyz")] += chooseFrom([+1, -1]);
     }
     const newPosition = new THREE.Vector3().addVectors(
-      self.currentPosition,
+      this.currentPosition,
       directionVector
     );
 
@@ -124,25 +141,25 @@ export const Pipe = function(scene, options) {
     if (getAt(newPosition)) {
       return;
     }
-    setAt(newPosition, self);
+    setAt(newPosition, this);
 
     // joint
     // (initial ball joint is handled elsewhere)
     if (lastDirectionVector && !lastDirectionVector.equals(directionVector)) {
-      if (chance(options.teapotChance)) {
-        makeTeapotJoint(self.currentPosition);
-      } else if (chance(options.ballJointChance)) {
-        makeBallJoint(self.currentPosition);
+      if (chance(this.options.teapotChance)) {
+        this.makeTeapotJoint(this.currentPosition);
+      } else if (chance(this.options.ballJointChance)) {
+        this.makeBallJoint(this.currentPosition);
       } else {
-        makeElbowJoint(self.currentPosition);
+        this.makeElbowJoint(this.currentPosition);
       }
     }
 
     // pipe
-    makeCylinderBetweenPoints(self.currentPosition, newPosition, self.material);
+    this.makeCylinderBetweenPoints(this.currentPosition, newPosition, this.material);
 
     // update
-    self.currentPosition = newPosition;
-    self.positions.push(newPosition);
+    this.currentPosition = newPosition;
+    this.positions.push(newPosition);
   };
-};
+}
