@@ -12,10 +12,12 @@ body {
   font-size: 12px;
 }
 #canvas-container {
-  position: relative;
+  /* position: relative; */
+  height: 100%;
 }
 canvas {
-  position: absolute;
+  /* position: absolute;
   left: 0;
-  top: 0;
+  top: 0; */
+  height: 100%;
 }
