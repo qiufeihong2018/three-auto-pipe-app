@@ -5,9 +5,60 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + React + TS</title>
+    <link rel="stylesheet" href="index.css" />
   </head>
   <body>
     <div id="root"></div>
+    <div class="controls ui-container">
+      <button id="fullscreen-button">全屏</button>
+      <label>
+        关节类型:
+        <select id="joint-types">
+          <option value="elbow">Elbow</option>
+          <option value="ball">Ball</option>
+          <option value="mixed" selected>Mixed</option>
+          <option value="cycle">Cycle</option>
+        </select>
+      </label>
+      <button id="toggle-controls">
+        <span class="normal-controls-enabled">Control Camera</span>
+        <span hidden class="orbit-controls-enabled">Relinquish Camera</span>
+      </button>
+      <table>
+        <thead>
+          <tr>
+            <th>Mouse Button</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="normal-controls-enabled">
+            <td>鼠标左键</td>
+            <td>切换视图</td>
+          </tr>
+          <tr class="normal-controls-enabled">
+            <td>鼠标右键</td>
+            <td>清除管道并重新构建</td>
+          </tr>
+          <tr hidden class="orbit-controls-enabled">
+            <td>鼠标左键 (拖拽)</td>
+            <td>旋转视图</td>
+          </tr>
+          <tr hidden class="orbit-controls-enabled">
+            <td>鼠标右键 (拖拽)</td>
+            <td>平移视图</td>
+          </tr>
+          <tr hidden class="orbit-controls-enabled">
+            <td>鼠标中间 (拖拽 or 滚动)</td>
+            <td>缩放视图</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="canvas-container">
+      <canvas id="canvas-webgl"></canvas>
+      <canvas id="canvas-2d" style="pointer-events: none"></canvas>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
