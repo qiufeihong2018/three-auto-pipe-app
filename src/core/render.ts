@@ -233,11 +233,8 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-function look() {
-  // TODO: never don't change the view (except maybe while clearing)
-  if (chance(1 / 2)) {
-    camera.position.set(0, 0, 14);
-  } else {
+// TODO: 随机视角
+function randomLook() {
     // 随机视角 view
     const vector = new THREE.Vector3(14, 0, 0);
     const axis = new THREE.Vector3(random(-1, 1), random(-1, 1), random(-1, 1));
@@ -246,13 +243,19 @@ function look() {
 
     vector.applyMatrix4(matrix);
     camera.position.copy(vector);
-  }
+  
   const center = new THREE.Vector3(0, 0, 0);
   camera.lookAt(center);
-  // camera.updateProjectionMatrix(); // maybe?
   controls.update();
 }
-look();
+
+function look() {
+  camera.position.set(10, 10, 10);
+  const center = new THREE.Vector3(0, 0, 0);
+  camera.lookAt(center);
+  controls.update();
+}
+
 
 addEventListener(
   "resize",
@@ -269,14 +272,13 @@ canvasContainer.addEventListener("mousedown", function(e) {
   if (!controls.enabled) {
     if (e.button) {
       clear(true);
-    } else {
-      look();
     }
   }
   window.getSelection()?.removeAllRanges();
   document.activeElement?.blur();
 });
 
+// 禁用鼠标右键
 canvasContainer.addEventListener(
   "contextmenu",
   function(e) {
@@ -318,8 +320,6 @@ function updateFromParametersInURL() {
   }
   params = params || {};
 
-  // update based on the parameters
-  // TODO: support more options
   showElementsIf(".ui-container", !params.hideUI);
 }
 
@@ -327,7 +327,7 @@ updateFromParametersInURL();
 window.addEventListener("hashchange", updateFromParametersInURL);
 
 // start animation
-export function render() {
+export function init() {
   initGui({
     clear: () => {
       clear(true)
