@@ -19,24 +19,3 @@ canvas {
   left: 0;
   top: 0;
 }
-.controls {
-  z-index: 1;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.4);
-  text-shadow: 0 0 2px black;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-.controls th {
-  text-align: left;
-}
-.controls th,
-.controls td {
-  padding: 0 10px 0;
-}
-.controls > button,
-.controls > label {
-  margin: 0 10px 0;
-}
-
