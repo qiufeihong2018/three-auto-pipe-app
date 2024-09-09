@@ -3,7 +3,7 @@ import * as THREE from 'three';
 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { textures } from './textures';
-import { chance, random, showElementsIf, shuffleArrayInPlace } from './util';
+import { chance, random, shuffleArrayInPlace } from './util';
 import { clearGrid } from './node';
 import { Pipe } from './pipe';
 import { initGui } from './gui';
@@ -51,7 +51,7 @@ const camera = new THREE.PerspectiveCamera(
 
 // controls
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enabled = false;
+controls.enabled = true;
 // 搭建场景
 const scene = new THREE.Scene();
 
@@ -286,45 +286,6 @@ canvasContainer.addEventListener(
   },
   false
 );
-
-const toggleControlButton = document.getElementById("toggle-controls") as HTMLButtonElement;
-toggleControlButton.addEventListener(
-  "click",
-  function() {
-    controls.enabled = !controls.enabled;
-    showElementsIf(".normal-controls-enabled", !controls.enabled);
-    showElementsIf(".orbit-controls-enabled", controls.enabled);
-  },
-  false
-);
-
-// parse URL parameters
-function updateFromParametersInURL() {
-  const paramsJSON = decodeURIComponent(location.hash.replace(/^#/, ""));
-  let params;
-  if (paramsJSON) {
-    try {
-      params = JSON.parse(paramsJSON);
-      if (typeof params !== "object") {
-        alert("Invalid URL parameter JSON: top level value must be an object");
-        params = null;
-      }
-    } catch (error) {
-      alert(
-        "Invalid URL parameter JSON syntax\n\n" +
-          error +
-          "\n\nRecieved:\n" +
-          paramsJSON
-      );
-    }
-  }
-  params = params || {};
-
-  showElementsIf(".ui-container", !params.hideUI);
-}
-
-updateFromParametersInURL();
-window.addEventListener("hashchange", updateFromParametersInURL);
 
 // start animation
 export function init() {
