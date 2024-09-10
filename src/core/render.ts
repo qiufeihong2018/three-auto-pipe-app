@@ -56,7 +56,7 @@ function clear() {
  * 5. 初始化视角
  * 6. 设置清除状态为 false
  */
-function reset() {
+export function reset() {
   renderer.clear();
   for (let i = 0; i < pipes.length; i++) {
     scene.remove(pipes[i].object3d);

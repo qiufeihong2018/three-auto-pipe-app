@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 // import { init } from './core';
-import { init } from './core/render';
+import { init, reset } from './core/render';
 import Tips from './components/Tips';
 
 
@@ -16,6 +16,9 @@ function App() {
       },
       false
     );
+    return () => {
+      reset();
+    }
   }, [])
 
   useEffect(() => {
