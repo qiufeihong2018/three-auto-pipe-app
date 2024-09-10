@@ -1,11 +1,13 @@
 
 import * as THREE from 'three';
 import { TeapotGeometry } from "three/addons/geometries/TeapotGeometry.js";
-import { chance, selectRandom, random, randomInteger, randomIntegerVector3WithinBox } from './util';
+import { chance, selectRandom, random, randomIntegerVector3WithinBox } from './util';
 import { textures } from './textures';
 import { getAt, setAt } from './node';
 
-// 三维空间中的一个轴对齐包围盒
+const materailColor = ["#d12a2a", "#fa541c", "#fa8c16", "#faad14", "#fadb14", "#a0d911", "#52c41a", "#13c2c2", "#2a54d1", "#2f54eb", "#722ed1", "#eb2f96"]
+
+// 管道所在的三维空间区域
 const gridBounds = new THREE.Box3(
   new THREE.Vector3(-10, -10, -10),
   new THREE.Vector3(10, 10, 10)
@@ -35,7 +37,9 @@ export class Pipe {
         map: textures[options.texturePath],
       });
     } else {
-      const color = randomInteger(0, 0xffffff);
+      // 具有随机颜色的材质对象
+      // const color = randomInteger(0, 0xffffff);
+      const color = selectRandom(materailColor);
       const emissive = new THREE.Color(color).multiplyScalar(0.3);
       this.material = new THREE.MeshPhongMaterial({
         specular: 0xa9fcff,
