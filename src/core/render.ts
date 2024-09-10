@@ -18,9 +18,13 @@ let jointsCycleIndex = 0;
 
 
 let pipes: any[] = [];
-let scene;
+// 渲染器对象
 let renderer;
+// 3D 场景对象 Scene
+let scene;
+// 相机对象
 let camera;
+// 相机控件， 通过相机控件OrbitControls实现旋转缩放预览效果
 let controls;
 
 const options = {
@@ -45,7 +49,12 @@ function clear() {
 
 /**
  * 重置场景
- * 
+ * 1. 清除渲染对象
+ * 2. 清除场景中的管道
+ * 3. 清空管道数据
+ * 4. 清空节点
+ * 5. 初始化视角
+ * 6. 设置清除状态为 false
  */
 function reset() {
   renderer.clear();
@@ -69,8 +78,9 @@ function createScene() {
     canvas: canvasWebGL,
   });
   renderer.setSize(window.innerWidth, window.innerHeight);
-
-  // camera
+  // 搭建场景
+  scene = new THREE.Scene();
+  // 实例化透视投影相机对象
   camera = new THREE.PerspectiveCamera(
     45,
     window.innerWidth / window.innerHeight,
@@ -78,11 +88,13 @@ function createScene() {
     100000
   );
 
-  // controls
+  /**
+   * 旋转：拖动鼠标左键
+   * 缩放：滚动鼠标中键
+   * 平移：拖动鼠标右键
+   */
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enabled = true;
-  // 搭建场景
-  scene = new THREE.Scene();
 
   // 场景的光线
   const ambientLight = new THREE.AmbientLight(0x111111);
@@ -99,34 +111,41 @@ function createScene() {
  * 
  */
 function createPipes() {
-  if (pipes.length === 0) {
-    let jointType = options.joints;
-    if (options.joints === JOINTS_CYCLE) {
-      jointType = jointsCycleArray[jointsCycleIndex++];
+  let jointType = options.joints;
+  if (options.joints === JOINTS_CYCLE) {
+    jointType = jointsCycleArray[jointsCycleIndex++];
+  }
+  const pipeOptions: any = {
+    teapotChance: 1 / 200, // 1 / 1000 in the original
+    ballJointChance:
+      jointType === JOINTS_BALL ? 1 : jointType === JOINTS_MIXED ? 1 / 3 : 0,
+    texturePath: options.texturePath,
+  };
+  // 5% 的概率生成茶壶
+  if (chance(1 / 20)) {
+    pipeOptions.teapotChance = 1 / 20;
+    pipeOptions.texturePath = "images/textures/candycane.png";
+  
+    if (!textures[pipeOptions.texturePath]) {
+      const textureLoader = new THREE.TextureLoader();
+      const texture = textureLoader.load(pipeOptions.texturePath);
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      texture.repeat.set(2, 2);
+      textures[pipeOptions.texturePath] = texture;
     }
-    const pipeOptions: any = {
-      teapotChance: 1 / 200, // 1 / 1000 in the original
-      ballJointChance:
-        jointType === JOINTS_BALL ? 1 : jointType === JOINTS_MIXED ? 1 / 3 : 0,
-      texturePath: options.texturePath,
-    };
-    // 5% 的概率生成茶壶
-    if (chance(1 / 20)) {
-      pipeOptions.teapotChance = 1 / 20;
-      pipeOptions.texturePath = "images/textures/candycane.png";
-   
-      if (!textures[pipeOptions.texturePath]) {
-        const textureLoader = new THREE.TextureLoader();
-        const texture = textureLoader.load(pipeOptions.texturePath);
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.set(2, 2);
-        textures[pipeOptions.texturePath] = texture;
-      }
-    }
-    // 构建管道（从头到尾属于一个管道，而非一节一节）
-    for (let i = 0; i < 1 + +options.multiple * (1 + +chance(1 / 10)); i++) {
-      pipes.push(new Pipe(scene, pipeOptions));
-    }
+  }
+  // 构建管道（从头到尾属于一个管道，而非一节一节）
+  for (let i = 0; i < 1 + +options.multiple * (1 + +chance(1 / 10)); i++) {
+    pipes.push(new Pipe(scene, pipeOptions));
+  }
+}
+
+/**
+ * 渲染管道
+ */
+function renderPipes() {
+  for (let i = 0; i < pipes.length; i++) {
+    pipes[i].update();
   }
 }
 
@@ -145,12 +164,12 @@ function updateTexture() {
 
 function animate() {
   controls.update();
-  updateTexture();
   // 执行管道的更新方法，每一帧都在运算（两个管道同时在绘制）
-  for (let i = 0; i < pipes.length; i++) {
-    pipes[i].update();
+  if (pipes.length === 0) {
+    createPipes();
+  } else {
+    renderPipes();
   }
-  createPipes();
 
   if (!clearing) {
     renderer.render(scene, camera);
@@ -186,6 +205,8 @@ function look() {
 export function init() {
   createScene();
   look();
+  updateTexture();
+  animate();
   initGui({
     clear: () => {
       clear();
@@ -197,8 +218,6 @@ export function init() {
       options.joints = val;
     }
   });
-  animate();
-
   return {
     renderer,
     camera
