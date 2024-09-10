@@ -1,7 +1,7 @@
 
 import * as THREE from 'three';
-
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
 import { textures } from './textures';
 import { chance, random } from './util';
 import { clearGrid } from './node';
@@ -18,6 +18,10 @@ let jointsCycleIndex = 0;
 
 
 let pipes: any[] = [];
+let scene;
+let renderer;
+let camera;
+let controls;
 
 const options = {
   multiple: true,
@@ -26,38 +30,40 @@ const options = {
   interval: [16, 24], // 渐隐效果的时间区间
 };
 
-const canvasContainer = document.getElementById("canvas-container") as HTMLCanvasElement;
 
-// renderer
-const canvasWebGL = document.getElementById("canvas-webgl") as HTMLCanvasElement;
-const renderer = new THREE.WebGLRenderer({
-  alpha: true,
-  antialias: true,
-  canvas: canvasWebGL,
-});
-renderer.setSize(window.innerWidth, window.innerHeight);
+/**
+ * 创建场景
+ */
+function createScene() {
+  const canvasWebGL = document.getElementById("canvas-webgl") as HTMLCanvasElement;
+  renderer = new THREE.WebGLRenderer({
+    alpha: true,
+    antialias: true,
+    canvas: canvasWebGL,
+  });
+  renderer.setSize(window.innerWidth, window.innerHeight);
 
-// camera
-const camera = new THREE.PerspectiveCamera(
-  45,
-  window.innerWidth / window.innerHeight,
-  1,
-  100000
-);
+  // camera
+  camera = new THREE.PerspectiveCamera(
+    45,
+    window.innerWidth / window.innerHeight,
+    1,
+    100000
+  );
 
-// controls
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enabled = true;
-// 搭建场景
-const scene = new THREE.Scene();
+  // controls
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enabled = true;
+  // 搭建场景
+  scene = new THREE.Scene();
 
-// lighting
-const ambientLight = new THREE.AmbientLight(0x111111);
-scene.add(ambientLight);
-
-const directionalLightL = new THREE.DirectionalLight(0xffffff, 0.9);
-directionalLightL.position.set(-1.2, 1.5, 0.5);
-scene.add(directionalLightL);
+  // 场景的光线
+  const ambientLight = new THREE.AmbientLight(0x111111);
+  scene.add(ambientLight);
+  const directionalLightL = new THREE.DirectionalLight(0xffffff, 0.9);
+  directionalLightL.position.set(-1.2, 1.5, 0.5);
+  scene.add(directionalLightL);
+}
 
 
 let clearing = false; // 是否正在清除场景
@@ -97,19 +103,11 @@ function reset() {
   clearing = false;
 }
 
-function animate() {
-  controls.update();
-  if (options.texturePath && !textures[options.texturePath]) {
-    const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load(options.texturePath);
-    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(2, 2);
-    textures[options.texturePath] = texture;
-  }
-  // 执行管道的更新方法，每一帧都在运算
-  for (let i = 0; i < pipes.length; i++) {
-    pipes[i].update();
-  }
+/**
+ * 创建管道（初始化管道配置）
+ * 
+ */
+function createPipes() {
   if (pipes.length === 0) {
     let jointType = options.joints;
     if (options.joints === JOINTS_CYCLE) {
@@ -121,8 +119,9 @@ function animate() {
         jointType === JOINTS_BALL ? 1 : jointType === JOINTS_MIXED ? 1 / 3 : 0,
       texturePath: options.texturePath,
     };
+    // 5% 的概率生成茶壶
     if (chance(1 / 20)) {
-      pipeOptions.teapotChance = 1 / 20; // why not? :)
+      pipeOptions.teapotChance = 1 / 20;
       pipeOptions.texturePath = "images/textures/candycane.png";
    
       if (!textures[pipeOptions.texturePath]) {
@@ -138,11 +137,32 @@ function animate() {
       pipes.push(new Pipe(scene, pipeOptions));
     }
   }
+}
 
+/**
+ * 更新材质
+ */
+function updateTexture() {
+  if (options.texturePath && !textures[options.texturePath]) {
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load(options.texturePath);
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(2, 2);
+    textures[options.texturePath] = texture;
+  }
+}
+
+function animate() {
+  controls.update();
+  updateTexture();
+  // 执行管道的更新方法，每一帧都在运算（两个管道同时在绘制）
+  for (let i = 0; i < pipes.length; i++) {
+    pipes[i].update();
+  }
+  createPipes();
   if (!clearing) {
     renderer.render(scene, camera);
   }
-
   requestAnimationFrame(animate);
 }
 
@@ -170,27 +190,9 @@ function look() {
 }
 
 
-addEventListener(
-  "resize",
-  function() {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-  },
-  false
-);
-
-// 禁用鼠标右键
-canvasContainer.addEventListener(
-  "contextmenu",
-  function(e) {
-    e.preventDefault();
-  },
-  false
-);
-
 // start animation
 export function init() {
+  createScene()
   initGui({
     clear: () => {
       clear();
@@ -203,5 +205,10 @@ export function init() {
     }
   });
   animate();
+
+  return {
+    renderer,
+    camera
+  }
 }
 

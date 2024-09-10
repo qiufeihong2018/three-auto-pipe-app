@@ -51,6 +51,7 @@ export class Pipe {
     this.makeBallJoint(this.currentPosition);
   }
 
+  // 节点 Ball
   public makeBallJoint(position) {
     const ball = new THREE.Mesh(
       new THREE.SphereGeometry(ballJointRadius, 8, 8),
@@ -60,6 +61,7 @@ export class Pipe {
     this.object3d.add(ball);
   };
 
+  // 节点 Cylinder
   public makeCylinderBetweenPoints(fromPoint, toPoint, material) {
     const deltaVector = new THREE.Vector3().subVectors(toPoint, fromPoint);
     const arrow = new THREE.ArrowHelper(
@@ -83,6 +85,7 @@ export class Pipe {
     this.object3d.add(mesh);
   };
 
+  // 节点 Teapot
   public makeTeapotJoint (position) {
     const teapot = new THREE.Mesh(
       new TeapotGeometry(teapotSize, 10, true, true, true, true),
@@ -96,6 +99,7 @@ export class Pipe {
     this.object3d.add(teapot);
   };
 
+  // 节点 Elbow
   public makeElbowJoint(fromPosition) {
     // "elball" (not a proper elbow)
     const elball = new THREE.Mesh(
@@ -107,9 +111,6 @@ export class Pipe {
   };
 
   public update() {
- 
-
-
     let directionVector;
     let lastDirectionVector;
     if (this.positions.length > 1) {
