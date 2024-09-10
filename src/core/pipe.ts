@@ -1,7 +1,7 @@
 
 import * as THREE from 'three';
 import { TeapotGeometry } from "three/addons/geometries/TeapotGeometry.js";
-import { chance, chooseFrom, random, randomInteger, randomIntegerVector3WithinBox } from './util';
+import { chance, selectRandom, random, randomInteger, randomIntegerVector3WithinBox } from './util';
 import { textures } from './textures';
 import { getAt, setAt } from './node';
 
@@ -124,7 +124,7 @@ export class Pipe {
       directionVector = lastDirectionVector;
     } else {
       directionVector = new THREE.Vector3();
-      directionVector[chooseFrom("xyz")] += chooseFrom([+1, -1]);
+      directionVector[selectRandom<string>("xyz")] += selectRandom([+1, -1]);
     }
     const newPosition = new THREE.Vector3().addVectors(
       this.currentPosition,

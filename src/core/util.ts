@@ -25,8 +25,18 @@ export function chance(value) {
   return Math.random() < value;
 }
 
-export function chooseFrom(values) {
-  return values[Math.floor(Math.random() * values.length)];
+/**
+ * 从给定的数组或字符串中，随机选择一个元素
+ * @param input - 输入的数组或字符串
+ * @returns 从输入中随机选择的元素
+ * @throws 如果输入为空，则抛出错误
+ */
+export function selectRandom<T>(input: T[] | string): T | string  {
+  if (input.length === 0) {
+    throw new Error("Input 不能为空");
+  }
+  const randomIndex = Math.floor(Math.random() * input.length);
+  return input[randomIndex];
 }
 
 export function shuffleArrayInPlace(array) {
