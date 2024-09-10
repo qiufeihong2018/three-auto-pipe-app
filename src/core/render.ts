@@ -116,6 +116,7 @@ function createPipes() {
     jointType = jointsCycleArray[jointsCycleIndex++];
   }
   const pipeOptions: any = {
+    jointType,
     teapotChance: 1 / 200, // 1 / 1000 in the original
     ballJointChance:
       jointType === JOINTS_BALL ? 1 : jointType === JOINTS_MIXED ? 1 / 3 : 0,

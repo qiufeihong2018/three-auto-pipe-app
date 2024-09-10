@@ -46,11 +46,12 @@ export class Pipe {
     }
 
     setAt(this.currentPosition, this);
+    // 开始的节点
     this.makeBallJoint(this.currentPosition);
   }
 
   // 使用圆柱（Cylinder）构建管道
-  public makeCylinderBetweenPoints(fromPoint, toPoint, material) {
+  public generatePipeLine(fromPoint, toPoint, material) {
     const deltaVector = new THREE.Vector3().subVectors(toPoint, fromPoint);
     const arrow = new THREE.ArrowHelper(
       deltaVector.clone().normalize(),
@@ -74,6 +75,22 @@ export class Pipe {
     // 將圆柱添加到管道实例中
     this.object3d.add(mesh);
   };
+
+  public generatePipeJoint(jointType, position) {
+    switch (jointType) {
+      case "ball":
+        this.makeBallJoint(position);
+        break;
+      case "teapot":
+        this.makeTeapotJoint(position);
+        break;
+      case "elbow":
+        this.makeElbowJoint(position);
+        break;
+      default:
+        break;
+    }
+  }
 
   // 节点 Ball
   public makeBallJoint(position) {
@@ -142,17 +159,11 @@ export class Pipe {
 
     // 关键点作为连接关节
     if (lastDirectionVector && !lastDirectionVector.equals(directionVector)) {
-      if (chance(this.options.teapotChance)) {
-        this.makeTeapotJoint(this.currentPosition);
-      } else if (chance(this.options.ballJointChance)) {
-        this.makeBallJoint(this.currentPosition);
-      } else {
-        this.makeElbowJoint(this.currentPosition);
-      }
+      this.generatePipeJoint(this.options.jointType, this.currentPosition);
     }
 
     // pipe
-    this.makeCylinderBetweenPoints(this.currentPosition, newPosition, this.material);
+    this.generatePipeLine(this.currentPosition, newPosition, this.material);
 
     // update
     this.currentPosition = newPosition;

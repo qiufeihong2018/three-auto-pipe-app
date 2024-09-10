@@ -21,7 +21,7 @@ export function initGui(options) {
 	} }, 'button').name('重新绘制');
 	
 	// 切换关节类型
-	gui.add(param, 'joint type', { 'Elbow': 'elbow', 'Ball': 'ball', 'Mixed': 'mixed', 'Cycle': 'cycle' }).onChange(function (val) {
+	gui.add(param, 'joint type', { 'Elbow': 'elbow', 'Ball': 'ball', 'Teapot': 'teapot' }).onChange(function (val) {
 		options.setJointType(val)
 	}).name('关节类型');
 
