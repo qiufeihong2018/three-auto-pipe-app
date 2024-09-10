@@ -7,7 +7,6 @@ import { chance, random } from './util';
 import { clearGrid } from './node';
 import { Pipe } from './pipe';
 import { initGui } from './gui';
-import { dissolve, runDissolveEffect } from './dissolveEffect';
 
 const JOINTS_ELBOW = "elbow";
 const JOINTS_BALL = "ball";
@@ -68,7 +67,7 @@ let clearTID = -1;
  * 清除场景
  * @param fast 是否快速清除
  */
-function clear(fast = true) {
+function clear() {
   clearTimeout(clearTID);
   clearTID = setTimeout(
     clear,
@@ -77,8 +76,7 @@ function clear(fast = true) {
 
   if (!clearing) {
     clearing = true;
-    const fadeOutTime = fast ? 0.2 : 2;
-    dissolve(fadeOutTime, reset);
+    reset()
   }
 }
 
@@ -145,8 +143,6 @@ function animate() {
     renderer.render(scene, camera);
   }
 
-  runDissolveEffect()
-
   requestAnimationFrame(animate);
 }
 
@@ -197,7 +193,7 @@ canvasContainer.addEventListener(
 export function init() {
   initGui({
     clear: () => {
-      clear(true)
+      clear();
       window.getSelection()?.removeAllRanges();
       document.activeElement?.blur();
     },
