@@ -20,6 +20,11 @@ export function initGui(options) {
 		options.clear()
 	} }, 'button').name('重新绘制');
 	
+	// 输出管道数据
+	gui.add({ 'button': () => {
+		options.printPipesInfo()
+	} }, 'button').name('管道数据');
+
 	// 切换关节类型
 	gui.add(param, 'joint type', { 'Elbow': 'elbow', 'Ball': 'ball', 'Teapot': 'teapot' }).onChange(function (val) {
 		options.setJointType(val)

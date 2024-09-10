@@ -127,6 +127,34 @@ export class Pipe {
     this.object3d.add(elball);
   };
 
+  /**
+   * 基于参数快速生成管道
+   */
+  public generate() {
+    let currentVector = new THREE.Vector3();
+    for (let i = 0; i < this.positions.length; i++) {
+      let nextVector;
+
+      const currentNode = this.positions[i];
+      const nextNode = this.positions[i + 1];
+      if (currentNode && nextNode) {
+        // 关键点作为连接关节
+        nextVector = new THREE.Vector3().subVectors(
+          currentNode,
+          nextNode
+        );
+        if (nextVector && !nextVector.equals(currentVector)) {
+          this.generatePipeJoint(this.options.jointType, currentNode);
+        }
+        this.generatePipeLine(currentNode, nextNode, this.material);
+        currentVector = nextVector;
+      } 
+    }
+  }
+
+  /**
+   * 基于算法逐步生成
+   */
   public update() {
     let directionVector;
     let lastDirectionVector;

@@ -7,6 +7,7 @@ import { chance, random } from './util';
 import { clearGrid } from './node';
 import { Pipe } from './pipe';
 import { initGui } from './gui';
+import defautPipesData from '../assets/data.json';
 
 const JOINTS_ELBOW = "elbow";
 const JOINTS_BALL = "ball";
@@ -15,6 +16,7 @@ const JOINTS_CYCLE = "cycle";
 
 const jointsCycleArray = [JOINTS_ELBOW, JOINTS_BALL, JOINTS_MIXED];
 let jointsCycleIndex = 0;
+let autoRenderPipe = false;
 
 
 let pipes: any[] = [];
@@ -104,11 +106,26 @@ function createScene() {
   scene.add(directionalLightL);
 }
 
+function initPipes() {
+  const pipeOptions = {
+    jointType: options.joints,
+    teapotChance: 1 / 200, // 1 / 1000 in the original
+    ballJointChance: 1,
+    texturePath: options.texturePath,
+  };
 
+  defautPipesData.forEach((pipeData) => {
+    const pipe  = new Pipe(scene, pipeOptions)
+    pipe.positions = pipeData.map(node => {
+      return new THREE.Vector3(node.x, node.y, node.z)
+    })
+    pipe.generate();
+    pipes.push(pipe);
+  })
+}
 
 /**
  * 创建管道（初始化管道配置）
- * 
  */
 function createPipes() {
   let jointType = options.joints;
@@ -165,11 +182,17 @@ function updateTexture() {
 
 function animate() {
   controls.update();
-  // 执行管道的更新方法，每一帧都在运算（两个管道同时在绘制）
-  if (pipes.length === 0) {
-    createPipes();
+  if (!autoRenderPipe) {
+    if (pipes.length === 0) {
+      initPipes();
+    }
   } else {
-    renderPipes();
+    // 执行管道的更新方法，每一帧都在运算（两个管道同时在绘制）
+    if (pipes.length === 0) {
+      createPipes();
+    } else {
+      renderPipes();
+    }
   }
 
   if (!clearing) {
@@ -210,6 +233,7 @@ export function init() {
   animate();
   initGui({
     clear: () => {
+      autoRenderPipe = true;
       clear();
       window.getSelection()?.removeAllRanges();
       document.activeElement?.blur();
@@ -217,6 +241,9 @@ export function init() {
     // 切换关节类型
     setJointType: (val) => {
       options.joints = val;
+    },
+    printPipesInfo: () => {
+      console.log('pipes:', pipes);
     }
   });
   return {
