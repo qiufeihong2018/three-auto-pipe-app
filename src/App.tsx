@@ -21,7 +21,6 @@ function App() {
   useEffect(() => {
     // canvas 的容器
     const canvasContainer = document.getElementById("canvas-container") as HTMLElement;
-
     // 禁用鼠标右键
     canvasContainer.addEventListener(
       "contextmenu",

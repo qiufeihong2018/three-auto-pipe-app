@@ -30,6 +30,33 @@ const options = {
   interval: [16, 24], // 渐隐效果的时间区间
 };
 
+let clearing = false; // 是否正在清除场景
+
+/**
+ * 清除场景
+ */
+function clear() {
+  if (clearing) {
+   return
+  }
+  clearing = true;
+  reset()
+}
+
+/**
+ * 重置场景
+ * 
+ */
+function reset() {
+  renderer.clear();
+  for (let i = 0; i < pipes.length; i++) {
+    scene.remove(pipes[i].object3d);
+  }
+  pipes = [];
+  clearGrid();
+  look();
+  clearing = false;
+}
 
 /**
  * 创建场景
@@ -66,42 +93,6 @@ function createScene() {
 }
 
 
-let clearing = false; // 是否正在清除场景
-let clearTID = -1;
-
-/**
- * 清除场景
- * @param fast 是否快速清除
- */
-function clear() {
-  clearTimeout(clearTID);
-  clearTID = setTimeout(
-    clear,
-    random(options.interval[0], options.interval[1]) * 1000
-  );
-
-  if (!clearing) {
-    clearing = true;
-    reset()
-  }
-}
-
-// TODO：取消重复新建场景的逻辑
-// clearTID = setTimeout(
-//   clear,
-//   random(options.interval[0], options.interval[1]) * 1000
-// );
-
-function reset() {
-  renderer.clear();
-  for (let i = 0; i < pipes.length; i++) {
-    scene.remove(pipes[i].object3d);
-  }
-  pipes = [];
-  clearGrid();
-  look();
-  clearing = false;
-}
 
 /**
  * 创建管道（初始化管道配置）
@@ -160,6 +151,7 @@ function animate() {
     pipes[i].update();
   }
   createPipes();
+
   if (!clearing) {
     renderer.render(scene, camera);
   }
@@ -192,7 +184,8 @@ function look() {
 
 // start animation
 export function init() {
-  createScene()
+  createScene();
+  look();
   initGui({
     clear: () => {
       clear();
