@@ -18,7 +18,7 @@ const teapotSize = ballJointRadius;
 export class Pipe {
   public currentPosition;
   public positions; /** 管道在空间上的关键点，这些点连起来就是管道 */
-  public object3d: THREE.Object3D;
+  public object3d: THREE.Object3D; /** 3D场景中的管道实例，可以有 children */
   public material;
   public options;
 
@@ -45,29 +45,19 @@ export class Pipe {
       });
     }
 
-  
     setAt(this.currentPosition, this);
-  
     this.makeBallJoint(this.currentPosition);
   }
 
-  // 节点 Ball
-  public makeBallJoint(position) {
-    const ball = new THREE.Mesh(
-      new THREE.SphereGeometry(ballJointRadius, 8, 8),
-      this.material
-    );
-    ball.position.copy(position);
-    this.object3d.add(ball);
-  };
-
-  // 节点 Cylinder
+  // 使用圆柱（Cylinder）构建管道
   public makeCylinderBetweenPoints(fromPoint, toPoint, material) {
     const deltaVector = new THREE.Vector3().subVectors(toPoint, fromPoint);
     const arrow = new THREE.ArrowHelper(
       deltaVector.clone().normalize(),
       fromPoint
     );
+    // 圆柱缓冲几何体
+    // https://threejs.org/docs/index.html?q=CylinderGeometry#api/zh/geometries/CylinderGeometry
     const geometry = new THREE.CylinderGeometry(
       pipeRadius,
       pipeRadius,
@@ -81,12 +71,22 @@ export class Pipe {
     mesh.rotation.setFromQuaternion(arrow.quaternion);
     mesh.position.addVectors(fromPoint, deltaVector.multiplyScalar(0.5));
     mesh.updateMatrix();
-
+    // 將圆柱添加到管道实例中
     this.object3d.add(mesh);
   };
 
+  // 节点 Ball
+  public makeBallJoint(position) {
+    const ball = new THREE.Mesh(
+      new THREE.SphereGeometry(ballJointRadius, 8, 8),
+      this.material
+    );
+    ball.position.copy(position);
+    this.object3d.add(ball);
+  };
+
   // 节点 Teapot
-  public makeTeapotJoint (position) {
+  public makeTeapotJoint(position) {
     const teapot = new THREE.Mesh(
       new TeapotGeometry(teapotSize, 10, true, true, true, true),
       this.material
@@ -100,13 +100,13 @@ export class Pipe {
   };
 
   // 节点 Elbow
-  public makeElbowJoint(fromPosition) {
+  public makeElbowJoint(position) {
     // "elball" (not a proper elbow)
     const elball = new THREE.Mesh(
       new THREE.SphereGeometry(pipeRadius, 8, 8),
       this.material
     );
-    elball.position.copy(fromPosition);
+    elball.position.copy(position);
     this.object3d.add(elball);
   };
 
@@ -120,10 +120,12 @@ export class Pipe {
         lastPosition
       );
     }
+    // 50% 的概率沿着上一个方向继续前进
     if (chance(1 / 2) && lastDirectionVector) {
       directionVector = lastDirectionVector;
     } else {
       directionVector = new THREE.Vector3();
+      // 50% 的概率选择一个新的方向(XYZ的正向or反向)
       directionVector[selectRandom<string>("xyz")] += selectRandom([+1, -1]);
     }
     const newPosition = new THREE.Vector3().addVectors(
