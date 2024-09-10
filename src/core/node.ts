@@ -1,5 +1,4 @@
 let nodes = {};
-
 export function clearGrid() {
   nodes = {};
 }

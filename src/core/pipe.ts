@@ -17,7 +17,7 @@ const teapotSize = ballJointRadius;
 
 export class Pipe {
   public currentPosition;
-  public positions;
+  public positions; /** 管道在空间上的关键点，这些点连起来就是管道 */
   public object3d: THREE.Object3D;
   public material;
   public options;
@@ -131,21 +131,14 @@ export class Pipe {
       directionVector
     );
 
-    // last 和 new 的点的位置
+    // 节点的重复检测
+    if (!gridBounds.containsPoint(newPosition) || getAt(newPosition)) {
+      return;
+    }
 
-    // TODO: try other possibilities
-    // ideally, have a pool of the 6 possible directions and try them in random order, removing them from the bag
-    // (and if there's truly nowhere to go, maybe make a ball joint)
-    if (!gridBounds.containsPoint(newPosition)) {
-      return;
-    }
-    if (getAt(newPosition)) {
-      return;
-    }
     setAt(newPosition, this);
 
-    // joint
-    // (initial ball joint is handled elsewhere)
+    // 关键点作为连接关节
     if (lastDirectionVector && !lastDirectionVector.equals(directionVector)) {
       if (chance(this.options.teapotChance)) {
         this.makeTeapotJoint(this.currentPosition);

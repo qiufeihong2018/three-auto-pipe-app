@@ -8,6 +8,11 @@ export function randomInteger(x1, x2) {
   return Math.round(random(x1, x2));
 }
 
+/**
+ * 生成位于 box 空间内的随机整数坐标
+ * @param box 
+ * @returns 一个位于三维空间中的点 
+ */
 export function randomIntegerVector3WithinBox(box) {
   return new THREE.Vector3(
     randomInteger(box.min.x, box.max.x),
