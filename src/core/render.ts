@@ -1,12 +1,12 @@
-import * as THREE from 'three'; // 导入 Three.js 库
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js'; // 导入轨道控制器
+import * as THREE from "three"; // 导入 Three.js 库
+import { OrbitControls } from "three/addons/controls/OrbitControls.js"; // 导入轨道控制器
 
-import { textures } from './textures'; // 导入纹理
-import { chance, random } from './util'; // 导入工具函数
-import { clearGrid } from './node'; // 导入清除网格函数
-import { Pipe } from './pipe'; // 导入管道类
-import { initGui } from './gui'; // 导入 GUI 初始化函数
-import defautPipesData from '../assets/data.json'; // 导入默认管道数据
+import { textures } from "./textures"; // 导入纹理
+import { chance, random } from "./util"; // 导入工具函数
+import { clearGrid } from "./node"; // 导入清除网格函数
+import { Pipe } from "./pipe"; // 导入管道类
+import { initGui } from "./gui"; // 导入 GUI 初始化函数
+import defautPipesData from "../assets/data.json"; // 导入默认管道数据
 
 const JOINTS_ELBOW = "elbow"; // 定义肘形关节常量
 const JOINTS_BALL = "ball"; // 定义球形关节常量
@@ -26,7 +26,7 @@ let controls; // 相机控件
 const options = {
   multiple: true, // 是否生成多个管道
   texturePath: null, // 纹理路径
-  joints: 'elbow', // 关节类型
+  joints: "elbow", // 关节类型
   interval: [16, 24], // 渐隐效果的时间区间
 };
 
@@ -67,7 +67,9 @@ export function reset() {
  * 创建场景
  */
 function createScene() {
-  const canvasWebGL = document.getElementById("canvas-webgl") as HTMLCanvasElement; // 获取 canvas 元素
+  const canvasWebGL = document.getElementById(
+    "canvas-webgl"
+  ) as HTMLCanvasElement; // 获取 canvas 元素
   renderer = new THREE.WebGLRenderer({
     alpha: true, // 启用透明度
     antialias: true, // 启用抗锯齿
@@ -111,7 +113,7 @@ function initPipes() {
 
   defautPipesData.forEach((pipeData) => {
     const pipe = new Pipe(scene, pipeOptions); // 创建管道
-    pipe.positions = pipeData.map(node => {
+    pipe.positions = pipeData.map((node) => {
       return new THREE.Vector3(node.x, node.y, node.z); // 设置管道位置
     });
     pipe.generate(); // 生成管道
@@ -138,7 +140,7 @@ function createPipes() {
   if (chance(1 / 20)) {
     pipeOptions.teapotChance = 1 / 20; // 设置茶壶出现的概率
     pipeOptions.texturePath = "images/textures/candycane.png"; // 设置纹理路径
-  
+
     if (!textures[pipeOptions.texturePath]) {
       const textureLoader = new THREE.TextureLoader(); // 创建纹理加载器
       const texture = textureLoader.load(pipeOptions.texturePath); // 加载纹理
@@ -209,7 +211,7 @@ function randomLook() {
 
   vector.applyMatrix4(matrix); // 应用旋转矩阵
   camera.position.copy(vector); // 设置相机位置
-  
+
   const center = new THREE.Vector3(0, 0, 0); // 定义中心点
   camera.lookAt(center); // 设置相机朝向中心点
   controls.update(); // 更新控制器
@@ -250,11 +252,12 @@ export function init() {
       options.joints = val; // 设置关节类型
     },
     printPipesInfo: () => {
-      console.log('pipes:', pipes); // 打印管道信息
-    }
+      console.log("pipes:", pipes); // 打印管道信息
+    },
   });
   return {
+    scene, // 返回场景
     renderer, // 返回渲染器
-    camera // 返回相机
-  }
+    camera, // 返回相机
+  };
 }
