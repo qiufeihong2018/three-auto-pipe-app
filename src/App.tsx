@@ -1,20 +1,19 @@
-import { useEffect } from "react";
+import { useEffect } from "react"; // 从 React 库中导入 useEffect 钩子函数
 // import { init } from './core';
-import { init, reset } from "./core/render";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import Tips from "./components/Tips";
+import { init, reset } from "./core/render"; // 从 core/render 模块中导入 init 和 reset 函数
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"; // 从 Three.js 库中导入 GLTFLoader
+import Tips from "./components/Tips"; // 导入 Tips 组件
 
 function App() {
   useEffect(() => {
-    const { renderer, camera, scene } = init();
+    const { renderer, camera, scene } = init(); // 初始化渲染器、相机和场景
 
     // 加载 3D 模型
-    const loader = new GLTFLoader();
+    const loader = new GLTFLoader(); // 创建 GLTFLoader 实例
     loader.load(
-      // "/model/花仙子_拉克丝.glb", // 替换为你的 3D 模型文件路径
-      '/model/压力容器-112.glb',
+      '/model/压力容器-112.glb', // 加载压力容器模型
       (gltf) => {
-        const model = gltf.scene;
+        const model = gltf.scene; // 获取加载的模型场景
         model.scale.set(10, 10, 10); // 缩放模型大小
         scene.add(model); // 将模型添加到场景中
       },
@@ -24,16 +23,16 @@ function App() {
       }
     );
     addEventListener(
-      "resize",
+      "resize", // 监听窗口大小变化事件
       function () {
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight); // 更新渲染器大小
+        camera.aspect = window.innerWidth / window.innerHeight; // 更新相机宽高比
+        camera.updateProjectionMatrix(); // 更新相机投影矩阵
       },
       false
     );
     return () => {
-      reset();
+      reset(); // 组件卸载时重置场景
     };
   }, []);
 
@@ -41,12 +40,12 @@ function App() {
     // canvas 的容器
     const canvasContainer = document.getElementById(
       "canvas-container"
-    ) as HTMLElement;
+    ) as HTMLElement; // 获取 canvas 容器元素
     // 禁用鼠标右键
     canvasContainer.addEventListener(
-      "contextmenu",
+      "contextmenu", // 监听右键菜单事件
       function (e) {
-        e.preventDefault();
+        e.preventDefault(); // 禁用默认右键菜单
       },
       false
     );
@@ -54,15 +53,15 @@ function App() {
 
   return (
     <>
-      <Tips />
-      <div id="canvas-container">
-        <canvas id="canvas-webgl"></canvas>
+      <Tips /> {/* 渲染 Tips 组件 */}
+      <div id="canvas-container"> {/* 定义 canvas 容器 */}
+        <canvas id="canvas-webgl"></canvas> {/* 定义 canvas 元素 */}
       </div>
     </>
   );
 }
 
-export default App;
+export default App; // 导出 App 组件
 // import React from "react";
 // import ThreeScene from "./components/LinesFat";
 

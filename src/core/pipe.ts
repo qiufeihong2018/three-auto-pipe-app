@@ -4,7 +4,7 @@ import { chance, selectRandom, random, randomIntegerVector3WithinBox } from './u
 import { textures } from './textures'; // 导入纹理
 import { getAt, setAt } from './node'; // 导入节点操作函数
 
-const materailColor = ["#d12a2a", "#fa541c", "#fa8c16", "#faad14", "#fadb14", "#a0d911", "#52c41a", "#13c2c2", "#2a54d1", "#2f54eb", "#722ed1", "#eb2f96"]; // 定义材质颜色数组
+const materailColor = ["#fa541c"]; // 定义材质颜色数组
 
 // 管道所在的三维空间区域
 const gridBounds = new THREE.Box3(

@@ -1,0 +1,224 @@
+[1mdiff --git a/src/App.tsx b/src/App.tsx[m
+[1mindex 352d852..6ec9d9a 100644[m
+[1m--- a/src/App.tsx[m
+[1m+++ b/src/App.tsx[m
+[36m@@ -1,59 +1,77 @@[m
+[31m-// import { useEffect } from 'react'[m
+[31m-// // import { init } from './core';[m
+[31m-// import { init, reset } from './core/render';[m
+[31m-// import Tips from './components/Tips';[m
+[32m+[m[32mimport { useEffect } from "react";[m
+[32m+[m[32m// import { init } from './core';[m
+[32m+[m[32mimport { init, reset } from "./core/render";[m
+[32m+[m[32mimport { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";[m
+[32m+[m[32mimport Tips from "./components/Tips";[m
+ [m
+[31m-// function App() {[m
+[31m-//   useEffect(() => {[m
+[31m-//     const { renderer, camera } = init();[m
+[31m-//     addEventListener([m
+[31m-//       "resize",[m
+[31m-//       function () {[m
+[31m-//         renderer.setSize(window.innerWidth, window.innerHeight);[m
+[31m-//         camera.aspect = window.innerWidth / window.innerHeight;[m
+[31m-//         camera.updateProjectionMatrix();[m
+[31m-//       },[m
+[31m-//       false[m
+[31m-//     );[m
+[31m-//     return () => {[m
+[31m-//       reset();[m
+[31m-//     }[m
+[31m-//   }, [])[m
+[32m+[m[32mfunction App() {[m
+[32m+[m[32m  useEffect(() => {[m
+[32m+[m[32m    const { renderer, camera, scene } = init();[m
+ [m
+[31m-//   useEffect(() => {[m
+[31m-//     // canvas 的容器[m
+[31m-//     const canvasContainer = document.getElementById("canvas-container") as HTMLElement;[m
+[31m-//     // 禁用鼠标右键[m
+[31m-//     canvasContainer.addEventListener([m
+[31m-//       "contextmenu",[m
+[31m-//       function (e) {[m
+[31m-//         e.preventDefault();[m
+[31m-//       },[m
+[31m-//       false[m
+[31m-//     );[m
+[32m+[m[32m    // 加载 3D 模型[m
+[32m+[m[32m    const loader = new GLTFLoader();[m
+[32m+[m[32m    loader.load([m
+[32m+[m[32m      // "/model/花仙子_拉克丝.glb", // 替换为你的 3D 模型文件路径[m
+[32m+[m[32m      '/model/压力容器-112.glb',[m
+[32m+[m[32m      (gltf) => {[m
+[32m+[m[32m        const model = gltf.scene;[m
+[32m+[m[32m        model.scale.set(10, 10, 10); // 缩放模型大小[m
+[32m+[m[32m        scene.add(model); // 将模型添加到场景中[m
+[32m+[m[32m      },[m
+[32m+[m[32m      undefined,[m
+[32m+[m[32m      (error) => {[m
+[32m+[m[32m        console.error("An error happened", error); // 处理加载错误[m
+[32m+[m[32m      }[m
+[32m+[m[32m    );[m
+[32m+[m[32m    addEventListener([m
+[32m+[m[32m      "resize",[m
+[32m+[m[32m      function () {[m
+[32m+[m[32m        renderer.setSize(window.innerWidth, window.innerHeight);[m
+[32m+[m[32m        camera.aspect = window.innerWidth / window.innerHeight;[m
+[32m+[m[32m        camera.updateProjectionMatrix();[m
+[32m+[m[32m      },[m
+[32m+[m[32m      false[m
+[32m+[m[32m    );[m
+[32m+[m[32m    return () => {[m
+[32m+[m[32m      reset();[m
+[32m+[m[32m    };[m
+[32m+[m[32m  }, []);[m
+ [m
+[31m-//   }, [])[m
+[32m+[m[32m  useEffect(() => {[m
+[32m+[m[32m    // canvas 的容器[m
+[32m+[m[32m    const canvasContainer = document.getElementById([m
+[32m+[m[32m      "canvas-container"[m
+[32m+[m[32m    ) as HTMLElement;[m
+[32m+[m[32m    // 禁用鼠标右键[m
+[32m+[m[32m    canvasContainer.addEventListener([m
+[32m+[m[32m      "contextmenu",[m
+[32m+[m[32m      function (e) {[m
+[32m+[m[32m        e.preventDefault();[m
+[32m+[m[32m      },[m
+[32m+[m[32m      false[m
+[32m+[m[32m    );[m
+[32m+[m[32m  }, []);[m
+ [m
+[31m-//   return ([m
+[31m-//     <>[m
+[31m-//       <Tips />[m
+[31m-//       <div id="canvas-container">[m
+[31m-//         <canvas id="canvas-webgl"></canvas>[m
+[31m-//       </div>[m
+[31m-//     </>[m
+[31m-//   )[m
+[31m-// }[m
+[31m-[m
+[31m-// export default App[m
+[31m-import React from "react";[m
+[31m-import ThreeScene from "./components/LinesFat";[m
+[31m-[m
+[31m-const App: React.FC = () => {[m
+   return ([m
+[31m-    <div>[m
+[31m-      <ThreeScene />[m
+[31m-    </div>[m
+[32m+[m[32m    <>[m
+[32m+[m[32m      <Tips />[m
+[32m+[m[32m      <div id="canvas-container">[m
+[32m+[m[32m        <canvas id="canvas-webgl"></canvas>[m
+[32m+[m[32m      </div>[m
+[32m+[m[32m    </>[m
+   );[m
+[31m-};[m
+[32m+[m[32m}[m
+ [m
+ export default App;[m
+[32m+[m[32m// import React from "react";[m
+[32m+[m[32m// import ThreeScene from "./components/LinesFat";[m
+[32m+[m
+[32m+[m[32m// const App: React.FC = () => {[m
+[32m+[m[32m//   return ([m
+[32m+[m[32m//     <div>[m
+[32m+[m[32m//       <ThreeScene />[m
+[32m+[m[32m//     </div>[m
+[32m+[m[32m//   );[m
+[32m+[m[32m// };[m
+[32m+[m
+[32m+[m[32m// export default App;[m
+[1mdiff --git a/src/core/render.ts b/src/core/render.ts[m
+[1mindex 1b16ce8..9e19df5 100644[m
+[1m--- a/src/core/render.ts[m
+[1m+++ b/src/core/render.ts[m
+[36m@@ -1,12 +1,12 @@[m
+[31m-import * as THREE from 'three'; // 导入 Three.js 库[m
+[31m-import { OrbitControls } from 'three/addons/controls/OrbitControls.js'; // 导入轨道控制器[m
+[32m+[m[32mimport * as THREE from "three"; // 导入 Three.js 库[m
+[32m+[m[32mimport { OrbitControls } from "three/addons/controls/OrbitControls.js"; // 导入轨道控制器[m
+ [m
+[31m-import { textures } from './textures'; // 导入纹理[m
+[31m-import { chance, random } from './util'; // 导入工具函数[m
+[31m-import { clearGrid } from './node'; // 导入清除网格函数[m
+[31m-import { Pipe } from './pipe'; // 导入管道类[m
+[31m-import { initGui } from './gui'; // 导入 GUI 初始化函数[m
+[31m-import defautPipesData from '../assets/data.json'; // 导入默认管道数据[m
+[32m+[m[32mimport { textures } from "./textures"; // 导入纹理[m
+[32m+[m[32mimport { chance, random } from "./util"; // 导入工具函数[m
+[32m+[m[32mimport { clearGrid } from "./node"; // 导入清除网格函数[m
+[32m+[m[32mimport { Pipe } from "./pipe"; // 导入管道类[m
+[32m+[m[32mimport { initGui } from "./gui"; // 导入 GUI 初始化函数[m
+[32m+[m[32mimport defautPipesData from "../assets/data.json"; // 导入默认管道数据[m
+ [m
+ const JOINTS_ELBOW = "elbow"; // 定义肘形关节常量[m
+ const JOINTS_BALL = "ball"; // 定义球形关节常量[m
+[36m@@ -26,7 +26,7 @@[m [mlet controls; // 相机控件[m
+ const options = {[m
+   multiple: true, // 是否生成多个管道[m
+   texturePath: null, // 纹理路径[m
+[31m-  joints: 'elbow', // 关节类型[m
+[32m+[m[32m  joints: "elbow", // 关节类型[m
+   interval: [16, 24], // 渐隐效果的时间区间[m
+ };[m
+ [m
+[36m@@ -67,7 +67,9 @@[m [mexport function reset() {[m
+  * 创建场景[m
+  */[m
+ function createScene() {[m
+[31m-  const canvasWebGL = document.getElementById("canvas-webgl") as HTMLCanvasElement; // 获取 canvas 元素[m
+[32m+[m[32m  const canvasWebGL = document.getElementById([m
+[32m+[m[32m    "canvas-webgl"[m
+[32m+[m[32m  ) as HTMLCanvasElement; // 获取 canvas 元素[m
+   renderer = new THREE.WebGLRenderer({[m
+     alpha: true, // 启用透明度[m
+     antialias: true, // 启用抗锯齿[m
+[36m@@ -111,7 +113,7 @@[m [mfunction initPipes() {[m
+ [m
+   defautPipesData.forEach((pipeData) => {[m
+     const pipe = new Pipe(scene, pipeOptions); // 创建管道[m
+[31m-    pipe.positions = pipeData.map(node => {[m
+[32m+[m[32m    pipe.positions = pipeData.map((node) => {[m
+       return new THREE.Vector3(node.x, node.y, node.z); // 设置管道位置[m
+     });[m
+     pipe.generate(); // 生成管道[m
+[36m@@ -138,7 +140,7 @@[m [mfunction createPipes() {[m
+   if (chance(1 / 20)) {[m
+     pipeOptions.teapotChance = 1 / 20; // 设置茶壶出现的概率[m
+     pipeOptions.texturePath = "images/textures/candycane.png"; // 设置纹理路径[m
+[31m-  [m
+[32m+[m
+     if (!textures[pipeOptions.texturePath]) {[m
+       const textureLoader = new THREE.TextureLoader(); // 创建纹理加载器[m
+       const texture = textureLoader.load(pipeOptions.texturePath); // 加载纹理[m
+[36m@@ -209,7 +211,7 @@[m [mfunction randomLook() {[m
+ [m
+   vector.applyMatrix4(matrix); // 应用旋转矩阵[m
+   camera.position.copy(vector); // 设置相机位置[m
+[31m-  [m
+[32m+[m
+   const center = new THREE.Vector3(0, 0, 0); // 定义中心点[m
+   camera.lookAt(center); // 设置相机朝向中心点[m
+   controls.update(); // 更新控制器[m
+[36m@@ -250,11 +252,12 @@[m [mexport function init() {[m
+       options.joints = val; // 设置关节类型[m
+     },[m
+     printPipesInfo: () => {[m
+[31m-      console.log('pipes:', pipes); // 打印管道信息[m
+[31m-    }[m
+[32m+[m[32m      console.log("pipes:", pipes); // 打印管道信息[m
+[32m+[m[32m    },[m
+   });[m
+   return {[m
+[32m+[m[32m    scene, // 返回场景[m
+     renderer, // 返回渲染器[m
+[31m-    camera // 返回相机[m
+[31m-  }[m
+[31m-}[m
+\ No newline at end of file[m
+[32m+[m[32m    camera, // 返回相机[m
+[32m+[m[32m  };[m
+[32m+[m[32m}[m
