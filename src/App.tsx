@@ -1,5 +1,5 @@
+import { TextureLoader } from "three"; // 从 Three.js 库中导入 THREE 变量
 import { useEffect } from "react"; // 从 React 库中导入 useEffect 钩子函数
-// import { init } from './core';
 import { init, reset } from "./core/render"; // 从 core/render 模块中导入 init 和 reset 函数
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"; // 从 Three.js 库中导入 GLTFLoader
 import Tips from "./components/Tips"; // 导入 Tips 组件
@@ -8,10 +8,16 @@ function App() {
   useEffect(() => {
     const { renderer, camera, scene } = init(); // 初始化渲染器、相机和场景
 
+    const textureLoader = new TextureLoader(); // 创建纹理加载器
+    const backgroundTexture = textureLoader.load(
+      "/public/texture/Corridor.jpg"
+    ); // 加载背景纹理
+    scene.background = backgroundTexture; // 设置场景背景
+
     // 加载 3D 模型
     const loader = new GLTFLoader(); // 创建 GLTFLoader 实例
     loader.load(
-      '/model/压力容器-112.glb', // 加载压力容器模型
+      "/model/压力容器-112.glb", // 加载压力容器模型
       (gltf) => {
         const model = gltf.scene; // 获取加载的模型场景
         model.scale.set(10, 10, 10); // 缩放模型大小
@@ -54,7 +60,9 @@ function App() {
   return (
     <>
       <Tips /> {/* 渲染 Tips 组件 */}
-      <div id="canvas-container"> {/* 定义 canvas 容器 */}
+      <div id="canvas-container">
+        {" "}
+        {/* 定义 canvas 容器 */}
         <canvas id="canvas-webgl"></canvas> {/* 定义 canvas 元素 */}
       </div>
     </>
