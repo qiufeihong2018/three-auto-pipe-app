@@ -31,30 +31,25 @@ export class Pipe {
   }
 
   // 创建材质
-  private createMaterial(texturePath: string | null): THREE.Material {
-    if (texturePath) {
-      this.texture = new THREE.TextureLoader().load(texturePath);
-      this.texture.wrapS = THREE.RepeatWrapping;
-      this.texture.wrapT = THREE.RepeatWrapping;
-      this.texture.repeat.set(3, 5); // 设置纹理重复
-      return new THREE.MeshLambertMaterial({
-        map: this.texture,
-        transparent: true, // 启用透明度
-        opacity: 1, // 设置透明度（0.0 - 1.0）
-      }); // 使用纹理创建材质
-    } else {
-      const color = selectRandom(materialColor); // 随机选择颜色
-      const emissive = new THREE.Color(color).multiplyScalar(0.3); // 设置发光颜色
-      return new THREE.MeshPhongMaterial({
-        map: this.texture,
-        specular: 0xa9fcff, // 镜面反射颜色
-        color: color, // 颜色
-        emissive: emissive, // 发光颜色
-        shininess: 100, // 光泽度
-        transparent: true,
-        opacity: 0.5,
-      });
-    }
+  private createMaterial(texturePath: string): THREE.Material {
+    const color = selectRandom(materialColor); // 随机选择颜色
+    const emissive = new THREE.Color(color).multiplyScalar(0.3); // 设置发光颜色
+
+    this.texture = new THREE.TextureLoader().load(texturePath);
+    this.texture.wrapS = THREE.RepeatWrapping;
+    this.texture.wrapT = THREE.RepeatWrapping;
+    this.texture.repeat.set(3, 5); // 设置纹理重复
+    return new THREE.MeshPhongMaterial({
+      map: this.texture,
+      specular: 0xa9fcff, // 镜面反射颜色
+      color: color, // 颜色
+      emissive: emissive, // 发光颜色
+      emissiveIntensity: 0.5, // 发光强度
+      shininess: 100, // 光泽度
+      transparent: true,
+      opacity: 0.5,
+    });
+    // }
   }
 
   // 使用圆柱（Cylinder）构建管道
