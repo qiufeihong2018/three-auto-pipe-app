@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { selectRandom, randomIntegerVector3WithinBox } from "./util";
-import { textures } from "./textures";
 import { setAt } from "./node";
 
 const materialColor = ["#e14848"]; // 定义材质颜色数组
@@ -17,6 +16,7 @@ export class Pipe {
   public object3d: THREE.Object3D; // 3D场景中的管道实例，可以有 children
   public material: THREE.Material; // 管道材质
   public options: any; // 管道选项
+  private texture: THREE.Texture | null = null; // 管道纹理
 
   constructor(scene: THREE.Scene, options: any) {
     this.options = options; // 初始化选项
@@ -26,21 +26,33 @@ export class Pipe {
     scene.add(this.object3d); // 将 3D 对象添加到场景中
 
     this.material = this.createMaterial(options.texturePath); // 创建材质
+
     setAt(this.currentPosition, this); // 在当前位置设置管道
   }
 
   // 创建材质
   private createMaterial(texturePath: string | null): THREE.Material {
     if (texturePath) {
-      return new THREE.MeshLambertMaterial({ map: textures[texturePath] }); // 使用纹理创建材质
+      this.texture = new THREE.TextureLoader().load(texturePath);
+      this.texture.wrapS = THREE.RepeatWrapping;
+      this.texture.wrapT = THREE.RepeatWrapping;
+      this.texture.repeat.set(3, 5); // 设置纹理重复
+      return new THREE.MeshLambertMaterial({
+        map: this.texture,
+        transparent: true, // 启用透明度
+        opacity: 1, // 设置透明度（0.0 - 1.0）
+      }); // 使用纹理创建材质
     } else {
       const color = selectRandom(materialColor); // 随机选择颜色
       const emissive = new THREE.Color(color).multiplyScalar(0.3); // 设置发光颜色
       return new THREE.MeshPhongMaterial({
+        map: this.texture,
         specular: 0xa9fcff, // 镜面反射颜色
         color: color, // 颜色
         emissive: emissive, // 发光颜色
         shininess: 100, // 光泽度
+        transparent: true,
+        opacity: 0.5,
       });
     }
   }
@@ -64,6 +76,7 @@ export class Pipe {
       4, // 高度分段数
       true // 是否开启顶部和底部
     ); // 创建圆柱几何体
+
     const mesh = new THREE.Mesh(geometry, material); // 创建圆柱网格
 
     mesh.rotation.setFromQuaternion(arrow.quaternion); // 设置旋转
@@ -108,6 +121,13 @@ export class Pipe {
         this.generatePipeLine(currentNode, nextNode, this.material); // 生成管道
         currentVector = nextVector; // 更新当前向量
       }
+    }
+  }
+
+  // 更新纹理偏移量
+  public updateTextureOffset(delta: number) {
+    if (this.texture) {
+      this.texture.offset.y += delta; // 更新纹理的水平偏移量
     }
   }
 }

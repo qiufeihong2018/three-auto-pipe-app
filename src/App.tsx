@@ -9,9 +9,7 @@ function App() {
     const { renderer, camera, scene } = init(); // 初始化渲染器、相机和场景
 
     const textureLoader = new TextureLoader(); // 创建纹理加载器
-    const backgroundTexture = textureLoader.load(
-      "/public/texture/Corridor.jpg"
-    ); // 加载背景纹理
+    const backgroundTexture = textureLoader.load("/texture/Corridor.jpg"); // 加载背景纹理
     scene.background = backgroundTexture; // 设置场景背景
 
     // 加载 3D 模型
@@ -72,7 +70,8 @@ function App() {
   return (
     <>
       <Tips /> {/* 渲染 Tips 组件 */}
-      <div id="canvas-container"> {/* 定义 canvas 容器 */}
+      <div id="canvas-container">
+        {/* 定义 canvas 容器 */}
         <canvas id="canvas-webgl"></canvas> {/* 定义 canvas 元素 */}
       </div>
     </>

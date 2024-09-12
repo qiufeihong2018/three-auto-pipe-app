@@ -7,8 +7,6 @@ import { Pipe } from "./pipe"; // 导入管道类
 import { initGui } from "./gui"; // 导入 GUI 初始化函数
 import defautPipesData from "../assets/data.json"; // 导入默认管道数据
 
-let autoRenderPipe = false; // 定义自动渲染管道标志
-
 let pipes: Pipe[] = []; // 定义管道数组
 let renderer: THREE.WebGLRenderer; // 渲染器对象
 let scene: THREE.Scene; // 3D 场景对象
@@ -17,7 +15,7 @@ let controls: OrbitControls; // 相机控件
 
 const options = {
   multiple: true, // 是否生成多个管道
-  texturePath: null, // 纹理路径
+  texturePath: "public/texture/arrow.png", // 纹理路径
   joints: "elbow", // 关节类型
 };
 
@@ -39,7 +37,9 @@ export function reset() {
  * 创建场景
  */
 function createScene() {
-  const canvasWebGL = document.getElementById("canvas-webgl") as HTMLCanvasElement; // 获取 canvas 元素
+  const canvasWebGL = document.getElementById(
+    "canvas-webgl"
+  ) as HTMLCanvasElement; // 获取 canvas 元素
   renderer = new THREE.WebGLRenderer({
     alpha: true, // 启用透明度
     antialias: true, // 启用抗锯齿
@@ -60,7 +60,7 @@ function createScene() {
   // 场景的光线
   const ambientLight = new THREE.AmbientLight(0x111111); // 创建环境光
   scene.add(ambientLight); // 添加环境光到场景
-  const directionalLightL = new THREE.DirectionalLight(0xffffff, 0.9); // 创建定向光
+  const directionalLightL = new THREE.DirectionalLight(0xffffff, 2); // 创建定向光
   directionalLightL.position.set(-1.2, 1.5, 0.5); // 设置定向光位置
   scene.add(directionalLightL); // 添加定向光到场景
 }
@@ -93,8 +93,19 @@ function updateTexture() {
   if (options.texturePath && !textures[options.texturePath]) {
     const textureLoader = new THREE.TextureLoader(); // 创建纹理加载器
     const texture = textureLoader.load(options.texturePath); // 加载纹理
-    texture.wrapS = texture.wrapT = THREE.RepeatWrapping; // 设置纹理重复
-    texture.repeat.set(2, 2); // 设置纹理重复次数
+
+    // 设置纹理重复模式
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+
+    // 设置纹理重复次数，增加重复次数以缩小纹理
+    texture.repeat.set(10, 10); // 根据需要调整重复次数
+
+    // 调整纹理的偏移量和旋转，确保方向正确
+    texture.offset.set(0, 0.5); // 根据需要调整偏移量
+    texture.center.set(0.5, 0.5); // 设置旋转中心为纹理的中心
+    texture.rotation = Math.PI ; // 确保方向正确
+
     textures[options.texturePath] = texture; // 将纹理添加到纹理对象
   }
 }
@@ -104,11 +115,12 @@ function updateTexture() {
  */
 function animate() {
   controls.update(); // 更新控制器
-  if (!autoRenderPipe && pipes.length === 0) {
+  if (pipes.length === 0) {
     initPipes(); // 初始化管道
   }
 
   if (!clearing) {
+    pipes.forEach((pipe) => pipe.updateTextureOffset(0.01)); // 更新每个管道的纹理偏移量
     renderer.render(scene, camera); // 渲染场景
   }
   requestAnimationFrame(animate); // 请求下一帧动画
