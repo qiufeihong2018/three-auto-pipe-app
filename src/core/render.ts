@@ -9,11 +9,11 @@ import defautPipesData from "../assets/data.json"; // 导入默认管道数据
 
 let autoRenderPipe = false; // 定义自动渲染管道标志
 
-let pipes: any[] = []; // 定义管道数组
-let renderer; // 渲染器对象
-let scene; // 3D 场景对象
-let camera; // 相机对象
-let controls; // 相机控件
+let pipes: Pipe[] = []; // 定义管道数组
+let renderer: THREE.WebGLRenderer; // 渲染器对象
+let scene: THREE.Scene; // 3D 场景对象
+let camera: THREE.PerspectiveCamera; // 相机对象
+let controls: OrbitControls; // 相机控件
 
 const options = {
   multiple: true, // 是否生成多个管道
@@ -24,20 +24,11 @@ const options = {
 let clearing = false; // 是否正在清除场景
 
 /**
- * 清除场景
- */
-function clear() {
-  if (clearing) return; // 如果正在清除，则返回
-  clearing = true; // 设置清除标志
-  reset(); // 重置场景
-}
-
-/**
  * 重置场景
  */
 export function reset() {
   renderer.clear(); // 清除渲染器
-  pipes.forEach(pipe => scene.remove(pipe.object3d)); // 从场景中移除管道
+  pipes.forEach((pipe) => scene.remove(pipe.object3d)); // 从场景中移除管道
   pipes = []; // 清空管道数组
   clearGrid(); // 清空节点
   look(); // 初始化视角
@@ -87,7 +78,9 @@ function initPipes() {
 
   defautPipesData.forEach((pipeData) => {
     const pipe = new Pipe(scene, pipeOptions); // 创建管道
-    pipe.positions = pipeData.map((node) => new THREE.Vector3(node.x, node.y, node.z)); // 设置管道位置
+    pipe.positions = pipeData.map(
+      (node) => new THREE.Vector3(node.x, node.y, node.z)
+    ); // 设置管道位置
     pipe.generate(); // 生成管道
     pipes.push(pipe); // 将管道添加到数组
   });

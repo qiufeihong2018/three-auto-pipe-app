@@ -10,7 +10,6 @@ const gridBounds = new THREE.Box3(
 );
 
 const pipeRadius = 0.6; // 管道半径
-const ballJointRadius = pipeRadius * 1.5; // 球形关节半径
 
 export class Pipe {
   public currentPosition: THREE.Vector3; // 当前管道位置
@@ -58,12 +57,12 @@ export class Pipe {
       fromPoint
     ); // 创建箭头辅助对象
     const geometry = new THREE.CylinderGeometry(
-      pipeRadius,
-      pipeRadius,
-      deltaVector.length(),
-      10,
-      4,
-      true
+      pipeRadius, // 顶部半径
+      pipeRadius, // 底部半径
+      deltaVector.length(), // 圆柱的高度
+      10, // 圆周分段数
+      4, // 高度分段数
+      true // 是否开启顶部和底部
     ); // 创建圆柱几何体
     const mesh = new THREE.Mesh(geometry, material); // 创建圆柱网格
 
@@ -85,9 +84,9 @@ export class Pipe {
   // 创建肘形关节
   private makeElbowJoint(position: THREE.Vector3) {
     const elball = new THREE.Mesh(
-      new THREE.SphereGeometry(pipeRadius, 8, 8),
-      this.material
-    ); // 创建球体几何体
+      new THREE.SphereGeometry(pipeRadius, 8, 8), // 创建球体几何体
+      this.material // 使用管道材质
+    );
     elball.position.copy(position); // 设置位置
     this.object3d.add(elball); // 添加到 3D 对象中
   }
@@ -96,7 +95,6 @@ export class Pipe {
   public generate() {
     let currentVector = new THREE.Vector3(); // 当前向量
     for (let i = 0; i < this.positions.length - 1; i++) {
-      // 修正循环条件，避免多余点
       const currentNode = this.positions[i]; // 当前节点
       const nextNode = this.positions[i + 1]; // 下一个节点
       if (currentNode && nextNode) {
