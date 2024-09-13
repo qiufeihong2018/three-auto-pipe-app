@@ -2,6 +2,7 @@ import { TextureLoader } from "three"; // 从 Three.js 库中导入 TextureLoade
 import { useEffect } from "react"; // 从 React 库中导入 useEffect 钩子函数
 import { init, reset } from "./core/render"; // 从 core/render 模块中导入 init 和 reset 函数
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"; // 从 Three.js 库中导入 GLTFLoader
+import LinesFat from './components/LinesFat'
 import Tips from "./components/Tips"; // 导入 Tips 组件
 
 function App() {
@@ -74,6 +75,7 @@ function App() {
         {/* 定义 canvas 容器 */}
         <canvas id="canvas-webgl"></canvas> {/* 定义 canvas 元素 */}
       </div>
+      {/* <LinesFat/> */}
     </>
   );
 }
