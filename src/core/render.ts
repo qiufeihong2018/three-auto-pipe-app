@@ -50,7 +50,7 @@ function createScene() {
   camera = new THREE.PerspectiveCamera(
     45, // 视角
     window.innerWidth / window.innerHeight, // 宽高比
-    1, // 近剪切面
+    10, // 近剪切面
     100000 // 远剪切面
   );
 
@@ -61,7 +61,7 @@ function createScene() {
   const ambientLight = new THREE.AmbientLight(0x111111); // 创建环境光
   scene.add(ambientLight); // 添加环境光到场景
   const directionalLightL = new THREE.DirectionalLight(0xffffff, 2); // 创建定向光
-  directionalLightL.position.set(-1.2, 1.5, 0.5); // 设置定向光位置
+  directionalLightL.position.set(1.2, 1.5, 5); // 设置定向光位置
   scene.add(directionalLightL); // 添加定向光到场景
 }
 
