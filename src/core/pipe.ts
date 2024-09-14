@@ -21,7 +21,6 @@ const pipeRadius = 0.6; // 定义管道的半径
 export class Pipe {
   // 定义一个名为Pipe的类
   // 公共属性
-  public currentPosition: THREE.Vector3; // 当前管道的位置
   public positions: THREE.Vector3[]; // 管道的所有位置
   public object3d: THREE.Object3D; // 管道的3D对象
   public material: THREE.Material; // 管道的材质
@@ -44,16 +43,13 @@ export class Pipe {
   constructor(scene: THREE.Scene, options: any) {
     // 构造函数
     this.options = options; // 初始化选项
-    this.currentPosition = randomIntegerVector3WithinBox(gridBounds); // 随机生成当前管道的位置
-    this.positions = [this.currentPosition]; // 初始化管道位置数组
     this.object3d = new THREE.Object3D(); // 创建一个3D对象
     scene.add(this.object3d); // 将3D对象添加到场景中
 
     this.material = this.createMaterial(options.texturePath); // 创建材质
-    setAt(this.currentPosition, this); // 设置当前管道的位置
 
     this.scene = scene; // 初始化场景
-    this.init(); // 初始化其他属性和方法
+    // this.init(); // 初始化其他属性和方法
   }
 
   private createMaterial(texturePath: string): THREE.Material {
@@ -76,6 +72,7 @@ export class Pipe {
       shininess: 100, // 设置光泽度
       transparent: true, // 设置透明
       opacity: 0.5, // 设置不透明度
+      side: THREE.DoubleSide, // 两面可见
     });
   }
 
