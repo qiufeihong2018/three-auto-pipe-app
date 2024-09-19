@@ -1,5 +1,10 @@
 import * as THREE from "three"; // 导入 Three.js 库
 import { OrbitControls } from "three/addons/controls/OrbitControls.js"; // 导入轨道控制器
+import {
+  CSS2DRenderer,
+  CSS2DObject,
+} from "three/examples/jsm/renderers/CSS2DRenderer"; // 导入 CSS2DRenderer 和 CSS2DObject
+import { Chart } from "@antv/g2"; // 导入 AntV G2 库
 
 import { textures } from "./textures"; // 导入纹理
 import { clearGrid } from "./node"; // 导入清除网格函数
@@ -9,6 +14,7 @@ import defautPipesData from "../assets/data.json"; // 导入默认管道数据
 
 let pipes: Pipe[] = []; // 定义管道数组
 let renderer: THREE.WebGLRenderer; // 渲染器对象
+let labelRenderer: CSS2DRenderer; // CSS2D渲染器对象
 let scene: THREE.Scene; // 3D 场景对象
 let camera: THREE.PerspectiveCamera; // 相机对象
 let controls: OrbitControls; // 相机控件
@@ -55,7 +61,18 @@ function createScene() {
   );
 
   controls = new OrbitControls(camera, renderer.domElement); // 创建轨道控制器
-  controls.enabled = true; // 启用控制器
+  controls.enableDamping = true; // 启用阻尼效果
+  controls.dampingFactor = 0.25; // 阻尼系数
+  controls.screenSpacePanning = true; // 禁用屏幕空间平移
+  controls.minDistance = 1; // 最小距离
+  controls.maxDistance = 500; // 最大距离
+
+  // 初始化 CSS2DRenderer
+  labelRenderer = new CSS2DRenderer();
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.domElement.style.position = "absolute";
+  labelRenderer.domElement.style.top = "0px";
+  document.body.appendChild(labelRenderer.domElement);
 
   // 场景的光线
   const ambientLight = new THREE.AmbientLight(0x111111); // 创建环境光
@@ -63,6 +80,56 @@ function createScene() {
   const directionalLightL = new THREE.DirectionalLight(0xffffff, 2); // 创建定向光
   directionalLightL.position.set(1.2, 1.5, 5); // 设置定向光位置
   scene.add(directionalLightL); // 添加定向光到场景
+
+  // 创建面板
+  const panelDiv = document.createElement("div");
+  panelDiv.className = "label";
+  panelDiv.style.backgroundColor = "#fff";
+  panelDiv.style.padding = "5px";
+  panelDiv.style.opacity = "0.8";
+  panelDiv.style.borderRadius = "5px";
+  const panelLabel = new CSS2DObject(panelDiv);
+  panelLabel.position.set(0, 1, 0); // 根据需要调整位置
+  scene.add(panelLabel);
+
+  // 创建AntV报表
+  fetch(
+    "https://gw.alipayobjects.com/os/bmw-prod/fbe4a8c1-ce04-4ba3-912a-0b26d6965333.json"
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      const chart = new Chart({
+        container: panelDiv,
+      });
+
+      const keyframe = chart
+        .timingKeyframe()
+        .attr("direction", "alternate")
+        .attr("iterationCount", 4);
+
+      keyframe
+        .interval()
+        .data(data)
+        .transform({ type: "groupX", y: "mean" })
+        .encode("x", "gender")
+        .encode("y", "weight")
+        .encode("color", "gender")
+        .encode("key", "gender");
+
+      keyframe
+        .point()
+        .data(data)
+        .encode("x", "height")
+        .encode("y", "weight")
+        .encode("color", "gender")
+        .encode("groupKey", "gender")
+        .encode("shape", "point");
+
+      chart.render();
+    });
+
+  // 监听窗口大小变化
+  window.addEventListener("resize", onWindowResize, false);
 }
 
 /**
@@ -104,7 +171,7 @@ function updateTexture() {
     // 调整纹理的偏移量和旋转，确保方向正确
     texture.offset.set(0, 0.5); // 根据需要调整偏移量
     texture.center.set(0.5, 0.5); // 设置旋转中心为纹理的中心
-    texture.rotation = Math.PI ; // 确保方向正确
+    texture.rotation = Math.PI; // 确保方向正确
 
     textures[options.texturePath] = texture; // 将纹理添加到纹理对象
   }
@@ -114,6 +181,7 @@ function updateTexture() {
  * 动画循环
  */
 function animate() {
+  requestAnimationFrame(animate);
   controls.update(); // 更新控制器
   if (pipes.length === 0) {
     initPipes(); // 初始化管道
@@ -122,8 +190,8 @@ function animate() {
   if (!clearing) {
     pipes.forEach((pipe) => pipe.updateTextureOffset(0.01)); // 更新每个管道的纹理偏移量
     renderer.render(scene, camera); // 渲染场景
+    labelRenderer.render(scene, camera); // 渲染CSS2D对象
   }
-  requestAnimationFrame(animate); // 请求下一帧动画
 }
 
 /**
@@ -154,4 +222,11 @@ export function init() {
     renderer, // 返回渲染器
     camera, // 返回相机
   };
+}
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
 }
