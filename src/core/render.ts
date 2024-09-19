@@ -46,6 +46,14 @@ function createScene() {
   const canvasWebGL = document.getElementById(
     "canvas-webgl"
   ) as HTMLCanvasElement; // 获取 canvas 元素
+
+  // 初始化 CSS2DRenderer
+  labelRenderer = new CSS2DRenderer();
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.domElement.style.position = "absolute";
+  labelRenderer.domElement.style.top = "0px";
+  document.body.appendChild(labelRenderer.domElement);
+
   renderer = new THREE.WebGLRenderer({
     alpha: true, // 启用透明度
     antialias: true, // 启用抗锯齿
@@ -60,20 +68,12 @@ function createScene() {
     100000 // 远剪切面
   );
 
-  controls = new OrbitControls(camera, renderer.domElement); // 创建轨道控制器
+  controls = new OrbitControls(camera, labelRenderer.domElement); // 创建轨道控制器
   controls.enableDamping = true; // 启用阻尼效果
   controls.dampingFactor = 0.25; // 阻尼系数
-  controls.screenSpacePanning = true; // 禁用屏幕空间平移
+  controls.screenSpacePanning = false; // 禁用屏幕空间平移
   controls.minDistance = 1; // 最小距离
   controls.maxDistance = 500; // 最大距离
-
-  // 初始化 CSS2DRenderer
-  labelRenderer = new CSS2DRenderer();
-  labelRenderer.setSize(window.innerWidth, window.innerHeight);
-  labelRenderer.domElement.style.position = "absolute";
-  labelRenderer.domElement.style.top = "0px";
-  document.body.appendChild(labelRenderer.domElement);
-
   // 场景的光线
   const ambientLight = new THREE.AmbientLight(0x111111); // 创建环境光
   scene.add(ambientLight); // 添加环境光到场景
@@ -86,10 +86,14 @@ function createScene() {
   panelDiv.className = "label";
   panelDiv.style.backgroundColor = "#fff";
   panelDiv.style.padding = "5px";
-  panelDiv.style.opacity = "0.8";
-  panelDiv.style.borderRadius = "5px";
+  panelDiv.style.opacity = "0.7";
+  panelDiv.style.width = "400px";
+  panelDiv.style.height = "200px";
+  panelDiv.style.borderRadius = "10px";
+  panelDiv.style.pointerEvents = "none"; // 确保面板不会阻止鼠标事件传递
+
   const panelLabel = new CSS2DObject(panelDiv);
-  panelLabel.position.set(0, 1, 0); // 根据需要调整位置
+  panelLabel.position.set(-10, 4, -4); // 根据需要调整位置
   scene.add(panelLabel);
 
   // 创建AntV报表
@@ -100,6 +104,8 @@ function createScene() {
     .then((data) => {
       const chart = new Chart({
         container: panelDiv,
+        width: 400,
+        height: 200,
       });
 
       const keyframe = chart
@@ -128,8 +134,42 @@ function createScene() {
       chart.render();
     });
 
+  // 创建连接面板和管道的线
+  const lineMaterial = new THREE.LineBasicMaterial({
+    color: "#fff",
+    transparent: true,
+    opacity: 0.7, // 设置线的透明度
+    linewidth: 5, // Corrected spelling
+    linecap: "round", // 设置线末端样式为圆角
+  });
+  const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(), // 起点（将更新）
+    new THREE.Vector3(), // 终点（将更新）
+  ]);
+  const line = new THREE.Line(lineGeometry, lineMaterial);
+  scene.add(line);
+
   // 监听窗口大小变化
   window.addEventListener("resize", onWindowResize, false);
+
+  // 动画循环
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // 更新线的起点和终点
+    const panelPosition = new THREE.Vector3();
+    panelLabel.getWorldPosition(panelPosition);
+
+    const pipePosition = new THREE.Vector3();
+
+    line.geometry.setFromPoints([panelPosition, pipePosition]);
+
+    controls.update();
+    renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+  }
+
+  animate();
 }
 
 /**
