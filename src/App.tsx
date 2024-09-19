@@ -3,10 +3,6 @@ import { useEffect } from "react"; // 从 React 库中导入 useEffect 钩子函
 import { init, reset } from "./core/render"; // 从 core/render 模块中导入 init 和 reset 函数
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"; // 从 Three.js 库中导入 GLTFLoader
 import Tips from "./components/Tips"; // 导入 Tips 组件
-import {
-  CSS2DRenderer,
-  CSS2DObject,
-} from "three/addons/renderers/CSS2DRenderer.js"; // 从 Three.js 库中导入 CSS2DRenderer
 
 function App() {
   useEffect(() => {
@@ -15,13 +11,6 @@ function App() {
     const textureLoader = new TextureLoader(); // 创建纹理加载器
     const backgroundTexture = textureLoader.load("/texture/Corridor.jpg"); // 加载背景纹理
     scene.background = backgroundTexture; // 设置场景背景
-
-    // 初始化 CSS2DRenderer
-    const labelRenderer = new CSS2DRenderer();
-    labelRenderer.setSize(window.innerWidth, window.innerHeight);
-    labelRenderer.domElement.style.position = "absolute";
-    labelRenderer.domElement.style.top = "0px";
-    document.body.appendChild(labelRenderer.domElement);
 
     // 加载 3D 模型
     const loader = new GLTFLoader(); // 创建 GLTFLoader 实例
@@ -39,18 +28,6 @@ function App() {
           model.scale.set(scale, scale, scale); // 缩放模型大小
           model.position.set(...position); // 设置模型位置
           scene.add(model); // 将模型添加到场景中
-
-          // 创建面板
-          const panelDiv = document.createElement("div");
-          panelDiv.className = "label";
-          panelDiv.textContent = "面板";
-          panelDiv.style.marginTop = "-1em";
-          panelDiv.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
-          panelDiv.style.padding = "5px";
-          panelDiv.style.borderRadius = "5px";
-          const panelLabel = new CSS2DObject(panelDiv);
-          panelLabel.position.set(0, 1, 0); // 根据需要调整位置
-          model.add(panelLabel);
         },
         undefined,
         (error) => {
@@ -63,7 +40,6 @@ function App() {
       renderer.setSize(window.innerWidth, window.innerHeight); // 更新渲染器大小
       camera.aspect = window.innerWidth / window.innerHeight; // 更新相机宽高比
       camera.updateProjectionMatrix(); // 更新相机投影矩阵
-      labelRenderer.setSize(window.innerWidth, window.innerHeight); // 更新CSS2DRenderer大小
     };
 
     window.addEventListener("resize", handleResize); // 监听窗口大小变化事件
