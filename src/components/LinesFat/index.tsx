@@ -47,8 +47,8 @@ const ThreeScene: React.FC = () => {
       controls.minDistance = 10; // 设置最小距离
       controls.maxDistance = 500; // 设置最大距离
 
-      const positions = []; // 定义位置数组
-      const colors = []; // 定义颜色数组
+      const positions: number[] = []; // 定义位置数组
+      const colors: number[] = []; // 定义颜色数组
 
       const points = GeometryUtils.hilbert3D(
         new THREE.Vector3(0, 0, 0),

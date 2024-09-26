@@ -15,18 +15,37 @@ function App() {
     // 加载 3D 模型
     const loader = new GLTFLoader(); // 创建 GLTFLoader 实例
     const models = [
-      { path: "/model/压力容器-112.glb", scale: 20, position: [0, -10, 0] },
-      { path: "/model/压力容器-112.glb", scale: 10, position: [-20, -8, 10] },
-      { path: "/model/压力容器-112.glb", scale: 10, position: [20, -8, 0] },
+      {
+        path: "/model/压力容器-112.glb",
+        scale: 20,
+        position: [0, -10, 0] as [number, number, number],
+        rotation: [0, Math.PI / 2, 0] as [number, number, number],
+      },
+      {
+        path: "/model/压力容器-112.glb",
+        scale: 10,
+        position: [-20, -8, 10] as [number, number, number],
+        rotation: [0, Math.PI / 4, 0] as [number, number, number],
+      },
+      {
+        path: "/model/压力容器-112.glb",
+        scale: 10,
+        position: [20, -8, 0] as [number, number, number],
+        rotation: [0, Math.PI / 2, 0] as [number, number, number],
+      },
     ];
 
-    models.forEach(({ path, scale, position }) => {
+    models.forEach(({ path, scale, position, rotation }) => {
       loader.load(
         path, // 加载模型路径
         (gltf) => {
           const model = gltf.scene; // 获取加载的模型场景
           model.scale.set(scale, scale, scale); // 缩放模型大小
+
           model.position.set(...position); // 设置模型位置
+          if (rotation) {
+            model.rotation.set(...rotation); // 设置模型旋转角度
+          }
           scene.add(model); // 将模型添加到场景中
         },
         undefined,

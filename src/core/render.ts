@@ -3,7 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js"; // 导�
 import {
   CSS2DRenderer,
   CSS2DObject,
-} from "three/examples/jsm/renderers/CSS2DRenderer"; // 导入 CSS2DRenderer 和 CSS2DObject
+} from "three/addons/renderers/CSS2DRenderer.js"; // 导入 CSS2DRenderer 和 CSS2DObject
 import { Chart } from "@antv/g2"; // 导入 AntV G2 库
 
 import { textures } from "./textures"; // 导入纹理

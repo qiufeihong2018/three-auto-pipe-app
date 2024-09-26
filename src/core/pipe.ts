@@ -5,16 +5,16 @@ const materialColor = ["#e14848"]; // 定义材质颜色数组
 const pipeRadius = 0.6; // 定义管道半径
 
 export class Pipe {
-  public positions: THREE.Vector3[]; // 管道位置数组
+  public positions?: THREE.Vector3[]; // 管道位置数组
   public object3d: THREE.Object3D; // 管道的3D对象
   public material: THREE.Material; // 内层管道材质
   public outMaterial: THREE.Material; // 外层管道材质
-  public options: any; // 配置选项
+  public options: { texturePath: string; jointType: string }; // 配置选项
+  public scene: THREE.Scene; // 场景
 
   private texture: THREE.Texture | null = null; // 纹理
-  private scene: THREE.Scene; // 场景
 
-  constructor(scene: THREE.Scene, options: any) {
+  constructor(scene: THREE.Scene, options: { texturePath: string; jointType: string }) {
     this.options = options; // 初始化配置选项
     this.object3d = new THREE.Object3D(); // 创建3D对象
     scene.add(this.object3d); // 将3D对象添加到场景中
@@ -27,7 +27,7 @@ export class Pipe {
   // 创建外层管道材质
   private createOutMaterial(): THREE.Material {
     const color = selectRandom("#000000"); // 随机选择颜色
-    const emissive = new THREE.Color(color).multiplyScalar(0.3); // 设置发光颜色
+    const emissive = new THREE.Color(color as THREE.ColorRepresentation).multiplyScalar(0.3); // 设置发光颜色
 
     return new THREE.MeshPhongMaterial({
       color: "#fafafa",
@@ -67,7 +67,7 @@ export class Pipe {
   // 生成渐变颜色数组
   private generateGradientColors(radialSegments: number, heightSegments: number): number[] {
     const vertexCount = (radialSegments + 1) * 2 * heightSegments; // 计算顶点数量
-    const colors = [];
+    const colors: number[] = [];
     const color1 = new THREE.Color('#F20C0C'); // 起始颜色
     const color2 = new THREE.Color('#D5D5D5'); // 结束颜色
 
@@ -172,6 +172,7 @@ export class Pipe {
   // 生成管道
   public generate() {
     let currentVector = new THREE.Vector3(); // 当前向量
+    if (!this.positions) return;
     for (let i = 0; i < this.positions.length - 1; i++) {
       const currentNode = this.positions[i]; // 当前节点
       const nextNode = this.positions[i + 1]; // 下一个节点
