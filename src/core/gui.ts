@@ -1,4 +1,4 @@
-import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 let gui;
 
@@ -12,7 +12,7 @@ export function initGui(options) {
           options.printPipesInfo();
         },
       },
-      "button"
+      'button',
     )
-    .name("管道数据");
+    .name('管道数据');
 }

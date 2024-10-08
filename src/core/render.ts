@@ -1,16 +1,16 @@
-import * as THREE from "three"; // 导入 Three.js 库
-import { OrbitControls } from "three/addons/controls/OrbitControls.js"; // 导入轨道控制器
+import * as THREE from 'three'; // 导入 Three.js 库
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'; // 导入轨道控制器
 import {
   CSS2DRenderer,
   CSS2DObject,
-} from "three/addons/renderers/CSS2DRenderer.js"; // 导入 CSS2DRenderer 和 CSS2DObject
-import { Chart } from "@antv/g2"; // 导入 AntV G2 库
+} from 'three/addons/renderers/CSS2DRenderer.js'; // 导入 CSS2DRenderer 和 CSS2DObject
+import { Chart } from '@antv/g2'; // 导入 AntV G2 库
 
-import { textures } from "./textures"; // 导入纹理
-import { clearGrid } from "./node"; // 导入清除网格函数
-import { Pipe } from "./pipe"; // 导入管道类
-import { initGui } from "./gui"; // 导入 GUI 初始化函数
-import defautPipesData from "../assets/data.json"; // 导入默认管道数据
+import { textures } from './textures'; // 导入纹理
+import { clearGrid } from './node'; // 导入清除网格函数
+import { Pipe } from './pipe'; // 导入管道类
+import { initGui } from './gui'; // 导入 GUI 初始化函数
+import defautPipesData from '../assets/data.json'; // 导入默认管道数据
 
 let pipes: Pipe[] = []; // 定义管道数组
 let renderer: THREE.WebGLRenderer; // 渲染器对象
@@ -21,8 +21,8 @@ let controls: OrbitControls; // 相机控件
 
 const options = {
   multiple: true, // 是否生成多个管道
-  texturePath: "public/texture/arrow.png", // 纹理路径
-  joints: "elbow", // 关节类型
+  texturePath: 'public/texture/arrow.png', // 纹理路径
+  joints: 'elbow', // 关节类型
 };
 
 let clearing = false; // 是否正在清除场景
@@ -44,14 +44,14 @@ export function reset() {
  */
 function createScene() {
   const canvasWebGL = document.getElementById(
-    "canvas-webgl"
+    'canvas-webgl',
   ) as HTMLCanvasElement; // 获取 canvas 元素
 
   // 初始化 CSS2DRenderer
   labelRenderer = new CSS2DRenderer();
   labelRenderer.setSize(window.innerWidth, window.innerHeight);
-  labelRenderer.domElement.style.position = "absolute";
-  labelRenderer.domElement.style.top = "0px";
+  labelRenderer.domElement.style.position = 'absolute';
+  labelRenderer.domElement.style.top = '0px';
   document.body.appendChild(labelRenderer.domElement);
 
   renderer = new THREE.WebGLRenderer({
@@ -65,7 +65,7 @@ function createScene() {
     45, // 视角
     window.innerWidth / window.innerHeight, // 宽高比
     10, // 近剪切面
-    100000 // 远剪切面
+    100000, // 远剪切面
   );
 
   controls = new OrbitControls(camera, labelRenderer.domElement); // 创建轨道控制器
@@ -82,15 +82,15 @@ function createScene() {
   scene.add(directionalLightL); // 添加定向光到场景
 
   // 创建面板
-  const panelDiv = document.createElement("div");
-  panelDiv.className = "label";
-  panelDiv.style.backgroundColor = "#fff";
-  panelDiv.style.padding = "5px";
-  panelDiv.style.opacity = "0.7";
-  panelDiv.style.width = "400px";
-  panelDiv.style.height = "200px";
-  panelDiv.style.borderRadius = "10px";
-  panelDiv.style.pointerEvents = "none"; // 确保面板不会阻止鼠标事件传递
+  const panelDiv = document.createElement('div');
+  panelDiv.className = 'label';
+  panelDiv.style.backgroundColor = '#fff';
+  panelDiv.style.padding = '5px';
+  panelDiv.style.opacity = '0.7';
+  panelDiv.style.width = '400px';
+  panelDiv.style.height = '200px';
+  panelDiv.style.borderRadius = '10px';
+  panelDiv.style.pointerEvents = 'none'; // 确保面板不会阻止鼠标事件传递
 
   const panelLabel = new CSS2DObject(panelDiv);
   panelLabel.position.set(-10, 4, -4); // 根据需要调整位置
@@ -98,7 +98,7 @@ function createScene() {
 
   // 创建AntV报表
   fetch(
-    "https://gw.alipayobjects.com/os/bmw-prod/fbe4a8c1-ce04-4ba3-912a-0b26d6965333.json"
+    'https://gw.alipayobjects.com/os/bmw-prod/fbe4a8c1-ce04-4ba3-912a-0b26d6965333.json',
   )
     .then((res) => res.json())
     .then((data) => {
@@ -110,37 +110,37 @@ function createScene() {
 
       const keyframe = chart
         .timingKeyframe()
-        .attr("direction", "alternate")
-        .attr("iterationCount", 4);
+        .attr('direction', 'alternate')
+        .attr('iterationCount', 4);
 
       keyframe
         .interval()
         .data(data)
-        .transform({ type: "groupX", y: "mean" })
-        .encode("x", "gender")
-        .encode("y", "weight")
-        .encode("color", "gender")
-        .encode("key", "gender");
+        .transform({ type: 'groupX', y: 'mean' })
+        .encode('x', 'gender')
+        .encode('y', 'weight')
+        .encode('color', 'gender')
+        .encode('key', 'gender');
 
       keyframe
         .point()
         .data(data)
-        .encode("x", "height")
-        .encode("y", "weight")
-        .encode("color", "gender")
-        .encode("groupKey", "gender")
-        .encode("shape", "point");
+        .encode('x', 'height')
+        .encode('y', 'weight')
+        .encode('color', 'gender')
+        .encode('groupKey', 'gender')
+        .encode('shape', 'point');
 
       chart.render();
     });
 
   // 创建连接面板和管道的线
   const lineMaterial = new THREE.LineBasicMaterial({
-    color: "#fff",
+    color: '#fff',
     transparent: true,
     opacity: 0.7, // 设置线的透明度
     linewidth: 5, // Corrected spelling
-    linecap: "round", // 设置线末端样式为圆角
+    linecap: 'round', // 设置线末端样式为圆角
   });
   const lineGeometry = new THREE.BufferGeometry().setFromPoints([
     new THREE.Vector3(), // 起点（将更新）
@@ -150,7 +150,7 @@ function createScene() {
   scene.add(line);
 
   // 监听窗口大小变化
-  window.addEventListener("resize", onWindowResize, false);
+  window.addEventListener('resize', onWindowResize, false);
 
   // 动画循环
   function animate() {
@@ -186,7 +186,7 @@ function initPipes() {
   defautPipesData.forEach((pipeData) => {
     const pipe = new Pipe(scene, pipeOptions); // 创建管道
     pipe.positions = pipeData.map(
-      (node) => new THREE.Vector3(node.x, node.y, node.z)
+      (node) => new THREE.Vector3(node.x, node.y, node.z),
     ); // 设置管道位置
     pipe.generate(); // 生成管道
     pipes.push(pipe); // 将管道添加到数组
@@ -254,7 +254,7 @@ export function init() {
   animate(); // 开始动画循环
   initGui({
     printPipesInfo: () => {
-      console.log("pipes:", pipes); // 打印管道信息
+      console.log('pipes:', pipes); // 打印管道信息
     },
   });
   return {

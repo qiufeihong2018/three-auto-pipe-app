@@ -6,10 +6,10 @@ export function clearGrid() {
 
 export function setAt(position, value) {
   // 将节点存储在对象中，键为节点的位置，值为节点的值
-  nodes["(" + position.x + ", " + position.y + ", " + position.z + ")"] = value;
+  nodes['(' + position.x + ', ' + position.y + ', ' + position.z + ')'] = value;
 }
 
 export function getAt(position) {
   // 根据位置从对象中获取节点的值
-  return nodes["(" + position.x + ", " + position.y + ", " + position.z + ")"];
+  return nodes['(' + position.x + ', ' + position.y + ', ' + position.z + ')'];
 }

@@ -1,4 +1,4 @@
-import * as THREE from "three"; // 导入 Three.js 库
+import * as THREE from 'three'; // 导入 Three.js 库
 
 // 生成 x1 和 x2 之间的随机数
 export function random(x1, x2) {
@@ -19,7 +19,7 @@ export function randomIntegerVector3WithinBox(box) {
   return new THREE.Vector3(
     randomInteger(box.min.x, box.max.x), // 生成 x 轴上的随机整数
     randomInteger(box.min.y, box.max.y), // 生成 y 轴上的随机整数
-    randomInteger(box.min.z, box.max.z) // 生成 z 轴上的随机整数
+    randomInteger(box.min.z, box.max.z), // 生成 z 轴上的随机整数
   );
 }
 
@@ -36,7 +36,7 @@ export function chance(value) {
  */
 export function selectRandom<T>(input: T[] | string): T | string {
   if (input.length === 0) {
-    throw new Error("Input 不能为空"); // 如果输入为空，则抛出错误
+    throw new Error('Input 不能为空'); // 如果输入为空，则抛出错误
   }
   const randomIndex = Math.floor(Math.random() * input.length); // 生成随机索引
   return input[randomIndex]; // 返回随机选择的元素

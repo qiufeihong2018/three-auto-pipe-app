@@ -1,7 +1,7 @@
-import * as THREE from "three"; // 导入Three.js库
-import { selectRandom } from "./util"; // 导入自定义的随机选择函数
+import * as THREE from 'three'; // 导入Three.js库
+import { selectRandom } from './util'; // 导入自定义的随机选择函数
 
-const materialColor = ["#e14848"]; // 定义材质颜色数组
+const materialColor = ['#e14848']; // 定义材质颜色数组
 const pipeRadius = 0.6; // 定义管道半径
 
 export class Pipe {
@@ -14,7 +14,10 @@ export class Pipe {
 
   private texture: THREE.Texture | null = null; // 纹理
 
-  constructor(scene: THREE.Scene, options: { texturePath: string; jointType: string }) {
+  constructor(
+    scene: THREE.Scene,
+    options: { texturePath: string; jointType: string },
+  ) {
     this.options = options; // 初始化配置选项
     this.object3d = new THREE.Object3D(); // 创建3D对象
     scene.add(this.object3d); // 将3D对象添加到场景中
@@ -26,11 +29,13 @@ export class Pipe {
 
   // 创建外层管道材质
   private createOutMaterial(): THREE.Material {
-    const color = selectRandom("#000000"); // 随机选择颜色
-    const emissive = new THREE.Color(color as THREE.ColorRepresentation).multiplyScalar(0.3); // 设置发光颜色
+    const color = selectRandom('#000000'); // 随机选择颜色
+    const emissive = new THREE.Color(
+      color as THREE.ColorRepresentation,
+    ).multiplyScalar(0.3); // 设置发光颜色
 
     return new THREE.MeshPhongMaterial({
-      color: "#fafafa",
+      color: '#fafafa',
       specular: 0xa9fcff,
       emissive: emissive,
       emissiveIntensity: 0.5,
@@ -65,7 +70,10 @@ export class Pipe {
   }
 
   // 生成渐变颜色数组
-  private generateGradientColors(radialSegments: number, heightSegments: number): number[] {
+  private generateGradientColors(
+    radialSegments: number,
+    heightSegments: number,
+  ): number[] {
     const vertexCount = (radialSegments + 1) * 2 * heightSegments; // 计算顶点数量
     const colors: number[] = [];
     const color1 = new THREE.Color('#F20C0C'); // 起始颜色
@@ -85,12 +93,12 @@ export class Pipe {
     toPoint: THREE.Vector3,
     radius: number,
     material: THREE.Material,
-    colors?: number[]
+    colors?: number[],
   ) {
     const deltaVector = new THREE.Vector3().subVectors(toPoint, fromPoint); // 计算两个点之间的向量
     const arrow = new THREE.ArrowHelper(
       deltaVector.clone().normalize(),
-      fromPoint
+      fromPoint,
     ); // 创建一个箭头辅助对象
 
     const radialSegments = 10;
@@ -102,19 +110,19 @@ export class Pipe {
       deltaVector.length(),
       radialSegments,
       heightSegments,
-      true
+      true,
     ); // 创建圆柱几何体
 
     if (colors) {
       const colorAttribute = new THREE.Float32BufferAttribute(colors, 3); // 创建颜色属性
-      geometry.setAttribute("color", colorAttribute); // 设置几何体的颜色属性
+      geometry.setAttribute('color', colorAttribute); // 设置几何体的颜色属性
     }
 
     const mesh = new THREE.Mesh(geometry, material); // 创建圆柱网格
     mesh.rotation.setFromQuaternion(arrow.quaternion); // 设置旋转
     mesh.position.addVectors(
       fromPoint,
-      deltaVector.clone().multiplyScalar(0.5)
+      deltaVector.clone().multiplyScalar(0.5),
     ); // 设置位置
     mesh.updateMatrix(); // 更新矩阵
     this.object3d.add(mesh); // 将圆柱网格添加到3D对象中
@@ -128,13 +136,16 @@ export class Pipe {
     const heightSegments = 4;
 
     // 生成渐变颜色数组，长度与几何体顶点数量匹配
-    const gradientColors = this.generateGradientColors(radialSegments, heightSegments);
+    const gradientColors = this.generateGradientColors(
+      radialSegments,
+      heightSegments,
+    );
     this.createCylinder(
       fromPoint,
       toPoint,
       pipeRadius + 0.2,
       this.outMaterial,
-      gradientColors
+      gradientColors,
     ); // 再创建外层管道，并应用渐变颜色
   }
 
@@ -144,8 +155,11 @@ export class Pipe {
     const heightSegments = 4;
 
     // 生成渐变颜色数组，长度与几何体顶点数量匹配
-    const gradientColors = this.generateGradientColors(radialSegments, heightSegments);
-    if (jointType === "elbow") {
+    const gradientColors = this.generateGradientColors(
+      radialSegments,
+      heightSegments,
+    );
+    if (jointType === 'elbow') {
       this.makeElbowJoint(position, gradientColors); // 如果接头类型是弯头，则生成弯头接头
     }
   }
@@ -154,7 +168,7 @@ export class Pipe {
   private makeElbowJoint(position: THREE.Vector3, colors?: number[]) {
     const elball = new THREE.Mesh(
       new THREE.SphereGeometry(pipeRadius, 8, 8),
-      this.material
+      this.material,
     ); // 创建内层弯头
     elball.position.copy(position); // 设置位置
     this.object3d.add(elball); // 将内层弯头添加到3D对象中
@@ -162,7 +176,7 @@ export class Pipe {
     const geometry = new THREE.SphereGeometry(pipeRadius + 0.2, 8, 8); // 创建外层弯头几何体
     if (colors) {
       const colorAttribute = new THREE.Float32BufferAttribute(colors, 3); // 创建颜色属性
-      geometry.setAttribute("color", colorAttribute); // 设置几何体的颜色属性
+      geometry.setAttribute('color', colorAttribute); // 设置几何体的颜色属性
     }
     const elballOut = new THREE.Mesh(geometry, this.outMaterial); // 创建外层弯头
     elballOut.position.copy(position); // 设置位置
@@ -179,7 +193,7 @@ export class Pipe {
       if (currentNode && nextNode) {
         const nextVector = new THREE.Vector3().subVectors(
           currentNode,
-          nextNode
+          nextNode,
         ); // 计算两个节点之间的向量
         if (!nextVector.equals(currentVector)) {
           this.generatePipeJoint(this.options.jointType, currentNode); // 如果向量不同，则生成接头

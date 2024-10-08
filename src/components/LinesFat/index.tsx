@@ -1,13 +1,13 @@
-import React, { useEffect, useRef } from "react"; // 导入 React 库和钩子函数
-import * as THREE from "three"; // 导入 Three.js 库
-import Stats from "three/addons/libs/stats.module.js"; // 导入性能监控库
-import { GPUStatsPanel } from "three/addons/utils/GPUStatsPanel.js"; // 导入 GPU 性能监控面板
-import { GUI } from "three/addons/libs/lil-gui.module.min.js"; // 导入 GUI 库
-import { OrbitControls } from "three/addons/controls/OrbitControls.js"; // 导入轨道控制器
-import { Line2 } from "three/addons/lines/Line2.js"; // 导入 Line2 类
-import { LineMaterial } from "three/addons/lines/LineMaterial.js"; // 导入 LineMaterial 类
-import { LineGeometry } from "three/addons/lines/LineGeometry.js"; // 导入 LineGeometry 类
-import * as GeometryUtils from "three/addons/utils/GeometryUtils.js"; // 导入几何工具库
+import React, { useEffect, useRef } from 'react'; // 导入 React 库和钩子函数
+import * as THREE from 'three'; // 导入 Three.js 库
+import Stats from 'three/addons/libs/stats.module.js'; // 导入性能监控库
+import { GPUStatsPanel } from 'three/addons/utils/GPUStatsPanel.js'; // 导入 GPU 性能监控面板
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js'; // 导入 GUI 库
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'; // 导入轨道控制器
+import { Line2 } from 'three/addons/lines/Line2.js'; // 导入 Line2 类
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js'; // 导入 LineMaterial 类
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js'; // 导入 LineGeometry 类
+import * as GeometryUtils from 'three/addons/utils/GeometryUtils.js'; // 导入几何工具库
 
 const ThreeScene: React.FC = () => {
   const mountRef = useRef<HTMLDivElement>(null); // 创建一个引用，用于挂载 Three.js 渲染器
@@ -35,7 +35,7 @@ const ThreeScene: React.FC = () => {
         40,
         window.innerWidth / window.innerHeight,
         1,
-        1000
+        1000,
       ); // 创建主相机
       camera.position.set(-40, 0, 60); // 设置相机位置
 
@@ -61,7 +61,7 @@ const ThreeScene: React.FC = () => {
         4,
         5,
         6,
-        7
+        7,
       ); // 生成 Hilbert 曲线点
 
       const spline = new THREE.CatmullRomCurve3(points); // 创建样条曲线
@@ -98,10 +98,10 @@ const ThreeScene: React.FC = () => {
 
       const geo = new THREE.BufferGeometry(); // 创建缓冲几何体
       geo.setAttribute(
-        "position",
-        new THREE.Float32BufferAttribute(positions, 3)
+        'position',
+        new THREE.Float32BufferAttribute(positions, 3),
       ); // 设置位置属性
-      geo.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3)); // 设置颜色属性
+      geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3)); // 设置颜色属性
 
       matLineBasic = new THREE.LineBasicMaterial({ vertexColors: true }); // 创建基本线材质
       matLineDashed = new THREE.LineDashedMaterial({
@@ -116,7 +116,7 @@ const ThreeScene: React.FC = () => {
       line1.visible = false; // 设置不可见
       scene.add(line1); // 将线段添加到场景中
 
-      window.addEventListener("resize", onWindowResize); // 添加窗口大小调整事件监听器
+      window.addEventListener('resize', onWindowResize); // 添加窗口大小调整事件监听器
       onWindowResize(); // 初始化窗口大小
 
       stats = new Stats(); // 创建性能监控对象
@@ -173,17 +173,17 @@ const ThreeScene: React.FC = () => {
       gui = new GUI(); // 创建 GUI 对象
 
       const param = {
-        "line type": 0,
-        "world units": false,
+        'line type': 0,
+        'world units': false,
         width: 5,
         alphaToCoverage: true,
         dashed: false,
-        "dash scale": 1,
-        "dash / gap": 1,
+        'dash scale': 1,
+        'dash / gap': 1,
       }; // 定义 GUI 参数
 
       gui
-        .add(param, "line type", { LineGeometry: 0, "gl.LINE": 1 })
+        .add(param, 'line type', { LineGeometry: 0, 'gl.LINE': 1 })
         .onChange(function (val) {
           switch (val) {
             case 0:
@@ -197,31 +197,31 @@ const ThreeScene: React.FC = () => {
           }
         });
 
-      gui.add(param, "world units").onChange(function (val) {
+      gui.add(param, 'world units').onChange(function (val) {
         matLine.worldUnits = val; // 设置是否使用世界单位
         matLine.needsUpdate = true; // 标记材质需要更新
       });
 
-      gui.add(param, "width", 1, 10).onChange(function (val) {
+      gui.add(param, 'width', 1, 10).onChange(function (val) {
         matLine.linewidth = val; // 设置线宽
       });
 
-      gui.add(param, "alphaToCoverage").onChange(function (val) {
+      gui.add(param, 'alphaToCoverage').onChange(function (val) {
         matLine.alphaToCoverage = val; // 设置是否启用 alphaToCoverage
       });
 
-      gui.add(param, "dashed").onChange(function (val) {
+      gui.add(param, 'dashed').onChange(function (val) {
         matLine.dashed = val; // 设置是否虚线
         line1.material = val ? matLineDashed : matLineBasic; // 切换材质
       });
 
-      gui.add(param, "dash scale", 0.5, 2, 0.1).onChange(function (val) {
+      gui.add(param, 'dash scale', 0.5, 2, 0.1).onChange(function (val) {
         matLine.dashScale = val; // 设置虚线比例
         matLineDashed.scale = val; // 设置虚线比例
       });
 
       gui
-        .add(param, "dash / gap", { "2 : 1": 0, "1 : 1": 1, "1 : 2": 2 })
+        .add(param, 'dash / gap', { '2 : 1': 0, '1 : 1': 1, '1 : 2': 2 })
         .onChange(function (val) {
           switch (val) {
             case 0:
@@ -249,7 +249,7 @@ const ThreeScene: React.FC = () => {
     init(); // 初始化场景
 
     return () => {
-      window.removeEventListener("resize", onWindowResize); // 移除窗口大小调整事件监听器
+      window.removeEventListener('resize', onWindowResize); // 移除窗口大小调整事件监听器
       mountRef.current?.removeChild(renderer.domElement); // 移除渲染器的 DOM 元素
       gui.destroy(); // 销毁 GUI
     };
