@@ -1,4 +1,3 @@
-import React from 'react';
 import Tips from './components/Tips';
 import useInitializeScene from './hooks/useInitializeScene';
 import useInitializeContextMenu from './hooks/useInitializeContextMenu';
